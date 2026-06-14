@@ -1,0 +1,140 @@
+/* ============================================================
+   Premium Brand Marquee — Sub4Links Store
+   ============================================================ */
+
+.brand-marquee {
+  padding-block: 5rem 4rem;
+  overflow: hidden;
+  background: radial-gradient(circle at center, rgba(6, 182, 212, 0.03) 0%, rgba(6, 6, 8, 0.98) 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  position: relative;
+}
+
+/* Add a grid overlay effect */
+.brand-marquee::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+.brand-marquee__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-inline: 1.5rem;
+  margin-bottom: 2.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.brand-marquee__label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: white;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #ffffff 30%, var(--s4l-accent-cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-marquee__label span {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  -webkit-text-fill-color: var(--fg-muted);
+  letter-spacing: 0.2em;
+  font-weight: 500;
+}
+
+.brand-marquee__track {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  direction: ltr; /* Force LTR layout for seamless infinite animation math */
+  mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  z-index: 2;
+  padding-block: 0.5rem;
+}
+
+@keyframes marqueeScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.3333%);
+  }
+}
+
+.brand-marquee__scroll {
+  display: flex;
+  gap: 2rem;
+  animation: marqueeScroll 35s linear infinite;
+  width: max-content;
+}
+
+/* Pause marquee on hover so the user can interact or look closer */
+.brand-marquee__scroll:hover {
+  animation-play-state: paused;
+}
+
+.brand-marquee__item {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  flex-shrink: 0;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.brand-marquee__item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.02),
+              0 0 12px var(--accent-glow);
+  transform: translateY(-2px);
+}
+
+.brand-marquee__logo-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg-muted);
+  transition: all 0.4s ease;
+  filter: grayscale(100%) brightness(0.8);
+}
+
+.brand-marquee__item:hover .brand-marquee__logo-wrapper {
+  filter: grayscale(0%) brightness(1.2);
+  color: var(--accent-glow);
+  transform: scale(1.1);
+}
+
+.brand-marquee__name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--fg-muted);
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+  transition: all 0.4s ease;
+}
+
+.brand-marquee__item:hover .brand-marquee__name {
+  color: white;
+}

@@ -1,0 +1,178 @@
+/* ============================================================
+   Categories Section — Premium UI/UX Max
+   ============================================================ */
+
+.categories__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-6);
+  margin-bottom: var(--sp-10);
+}
+
+.categories__title {
+  margin-top: var(--sp-2);
+}
+
+.categories__view-all {
+  flex-shrink: 0;
+  color: var(--s4l-accent-cyan);
+}
+
+.categories__view-all:hover {
+  text-shadow: var(--glow-brand);
+}
+
+.categories__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-6);
+}
+
+/* Category Card */
+.category-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-10) var(--sp-4);
+  background: var(--s4l-bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-2xl);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.4s var(--ease-spring);
+  overflow: hidden;
+}
+
+.category-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-glass);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.category-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r-2xl);
+  padding: 1px;
+  background: var(--gradient-accent);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.category-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: var(--shadow-lg), var(--glow-brand);
+  background: var(--s4l-bg-elevated);
+}
+
+.category-card:hover::before,
+.category-card:hover::after {
+  opacity: 1;
+}
+
+.category-card__icon {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-muted);
+  color: var(--fg);
+  border-radius: var(--r-xl);
+  transition: all 0.4s var(--ease-spring);
+  border: 1px solid var(--border-strong);
+}
+
+.category-card:hover .category-card__icon {
+  background: var(--gradient-accent);
+  color: white;
+  box-shadow: var(--glow-brand);
+  border-color: transparent;
+  transform: scale(1.1) rotate(5deg);
+}
+
+.category-card__name {
+  position: relative;
+  font-size: var(--fs-18);
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.category-card__count {
+  position: relative;
+  font-size: var(--fs-14);
+  color: var(--fg-muted);
+}
+
+.category-card__arrow {
+  position: absolute;
+  top: var(--sp-4);
+  right: var(--sp-4);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--s4l-accent-cyan);
+  opacity: 0;
+  transform: translateX(-12px);
+  transition: all 0.4s var(--ease-spring);
+}
+
+.category-card:hover .category-card__arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 1023px) {
+  .categories__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 639px) {
+  .categories__grid {
+    grid-template-columns: 1fr;
+    gap: var(--sp-4);
+  }
+
+  .categories__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--sp-3);
+  }
+
+  .category-card {
+    padding: var(--sp-6) var(--sp-4);
+    flex-direction: row;
+    text-align: right;
+  }
+  
+  .category-card__icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .category-card__arrow {
+    top: 50%;
+    transform: translateY(-50%) translateX(-12px);
+  }
+  
+  .category-card:hover .category-card__arrow {
+    transform: translateY(-50%) translateX(0);
+  }
+}
