@@ -10,7 +10,7 @@
 
 
 /* ============================================================
-   Product Card Styles — Premium UI/UX Max
+   Product Card Styles — Premium UI/UX Max + Mobile Optimized
    ============================================================ */
 
 .product-card {
@@ -216,4 +216,104 @@
   font-size: var(--fs-14);
   color: var(--fg-muted);
   text-decoration: line-through;
+}
+
+/* ====== MOBILE RESPONSIVE ====== */
+@media (max-width: 639px) {
+  .product-card {
+    border-radius: 16px;
+  }
+
+  .product-card::before {
+    border-radius: 16px;
+  }
+
+  .product-card:hover {
+    transform: none;
+  }
+
+  .product-card:active {
+    transform: scale(0.98);
+  }
+
+  .product-card__image-wrap {
+    aspect-ratio: 4 / 3;
+  }
+
+  .product-card__image {
+    border-radius: 0;
+  }
+
+  /* Always show actions on mobile (no hover) */
+  .product-card__actions {
+    opacity: 1;
+    transform: translateX(0);
+    flex-direction: row;
+    right: var(--sp-2);
+    bottom: var(--sp-2);
+    gap: 4px;
+  }
+
+  .product-card__action {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+
+  .product-card__action svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .product-card__info {
+    padding: 10px 12px 14px;
+    gap: 6px;
+  }
+
+  .product-card__name {
+    font-size: 13px;
+    min-height: unset;
+    -webkit-line-clamp: 2;
+    line-height: 1.35;
+  }
+
+  .product-card__rating {
+    gap: 4px;
+  }
+
+  .product-card__stars svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  .product-card__rating-text {
+    font-size: 10px;
+  }
+
+  .product-card__price-row {
+    gap: 6px;
+    padding-top: 2px;
+  }
+
+  .product-card__price {
+    font-size: 15px;
+  }
+
+  .product-card__original-price {
+    font-size: 11px;
+  }
+
+  .product-card__badge {
+    top: 6px;
+    left: 6px;
+    font-size: 9px;
+    padding: 2px 6px;
+  }
+
+  .product-card__discount {
+    top: 6px;
+    right: 6px;
+    font-size: 10px;
+    padding: 2px 5px;
+  }
 }

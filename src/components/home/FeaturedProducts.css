@@ -118,7 +118,7 @@
 @media (max-width: 767px) {
   .featured__grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--sp-4);
+    gap: 12px;
   }
 
   .featured__header {
@@ -126,11 +126,21 @@
     align-items: flex-start;
     gap: var(--sp-3);
   }
+
+  .featured__tabs {
+    gap: 8px;
+    margin-bottom: var(--sp-6);
+  }
+
+  .featured__tab {
+    padding: 8px 16px;
+    font-size: 12px;
+  }
 }
 
-@media (max-width: 479px) {
+@media (max-width: 379px) {
   .featured__grid {
-    grid-template-columns: 1fr;
-    gap: var(--sp-6);
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 }

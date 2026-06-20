@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Search, ShoppingBag, User, Menu, X, Heart,
-  ChevronDown, Globe, Zap, BookOpen
+  ChevronDown, Globe, Zap, BookOpen, Home, Grid3X3
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import CartDrawer from '../cart/CartDrawer';
@@ -206,6 +206,43 @@ export default function Navbar() {
           </div>
         </div>
       )}
+
+      {/* ── Mobile Bottom Navigation Bar ── */}
+      <div className="bottom-nav" id="bottom-nav">
+        <Link to="/" className={`bottom-nav__item ${isActive('/') ? 'bottom-nav__item--active' : ''}`}>
+          <span className="bottom-nav__icon"><Home size={20} /></span>
+          <span className="bottom-nav__label">الرئيسية</span>
+        </Link>
+
+        <Link to="/shop" className={`bottom-nav__item ${isActive('/shop') || location.pathname.startsWith('/subscriptions') || location.pathname.startsWith('/services') || location.pathname.startsWith('/courses') ? 'bottom-nav__item--active' : ''}`}>
+          <span className="bottom-nav__icon"><Grid3X3 size={20} /></span>
+          <span className="bottom-nav__label">المنتجات</span>
+        </Link>
+
+        <button
+          className="bottom-nav__item"
+          onClick={() => setCartOpen(true)}
+        >
+          <span className="bottom-nav__icon">
+            <ShoppingBag size={20} />
+            {cartCount > 0 && <span className="bottom-nav__badge">{cartCount}</span>}
+          </span>
+          <span className="bottom-nav__label">السلة</span>
+        </button>
+
+        <button
+          className="bottom-nav__item"
+          onClick={() => setSearchOpen(!searchOpen)}
+        >
+          <span className="bottom-nav__icon"><Search size={20} /></span>
+          <span className="bottom-nav__label">بحث</span>
+        </button>
+
+        <Link to="/customer" className={`bottom-nav__item ${location.pathname.startsWith('/customer') ? 'bottom-nav__item--active' : ''}`}>
+          <span className="bottom-nav__icon"><User size={20} /></span>
+          <span className="bottom-nav__label">حسابي</span>
+        </Link>
+      </div>
 
       {/* Cart Drawer */}
       <CartDrawer />
