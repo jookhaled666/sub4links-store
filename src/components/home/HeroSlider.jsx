@@ -1,124 +1,74 @@
-import { useState, useEffect, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
-import { heroSlides, stats } from '../../data/products';
+import { ArrowLeft, Sparkles, ShieldCheck, Zap } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import './HeroSlider.css';
 
 export default function HeroSlider() {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-
-  const goToSlide = useCallback((index) => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setCurrentSlide(index);
-    setTimeout(() => setIsTransitioning(false), 700);
-  }, [isTransitioning]);
-
-  const nextSlide = useCallback(() => {
-    goToSlide((currentSlide + 1) % heroSlides.length);
-  }, [currentSlide, goToSlide]);
-
-  const prevSlide = useCallback(() => {
-    goToSlide((currentSlide - 1 + heroSlides.length) % heroSlides.length);
-  }, [currentSlide, goToSlide]);
-
-  useEffect(() => {
-    const timer = setInterval(nextSlide, 6000);
-    return () => clearInterval(timer);
-  }, [nextSlide]);
-
-  const slide = heroSlides[currentSlide];
-
   return (
-    <section className="hero" id="hero-section">
-      {/* Background Images */}
-      {heroSlides.map((s, i) => (
-        <div
-          key={s.id}
-          className={`hero__bg ${i === currentSlide ? 'hero__bg--active' : ''}`}
-          style={{ backgroundImage: `url(${s.image})` }}
-          aria-hidden="true"
-        />
-      ))}
-
-      {/* Gradient Overlay */}
-      <div
-        className="hero__overlay"
-        style={{ background: slide.gradient }}
-      />
-
-      {/* Decorative Elements */}
-      <div className="hero__decor" aria-hidden="true">
-        <div className="hero__circle hero__circle--1" />
-        <div className="hero__circle hero__circle--2" />
-        <div className="hero__grid-pattern" />
+    <section className="hero-pro-max" id="hero-section">
+      {/* Dynamic Background Effects */}
+      <div className="hero-pro-max__bg">
+        <div className="hero-pro-max__orb hero-pro-max__orb--1"></div>
+        <div className="hero-pro-max__orb hero-pro-max__orb--2"></div>
+        <div className="hero-pro-max__orb hero-pro-max__orb--3"></div>
+        <div className="hero-pro-max__grid"></div>
       </div>
 
-      {/* Content */}
-      <div className="hero__content container">
-        <div className="hero__text" key={currentSlide}>
-          <span className="hero__badge badge badge-gold animate-fade-in-up">
-            {slide.subtitle}
-          </span>
-          <h1 className="hero__title animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-            {slide.title}
+      <div className="hero-pro-max__container container">
+        {/* Main Content */}
+        <div className="hero-pro-max__content">
+          <div className="hero-pro-max__badge">
+            <Sparkles size={16} className="hero-pro-max__badge-icon" />
+            <span>مستقبل الخدمات الرقمية</span>
+          </div>
+          
+          <h1 className="hero-pro-max__title">
+            ارتقِ بعملك إلى <br />
+            <span className="text-gradient-premium">المستوى التالي</span>
           </h1>
-          <p className="hero__description animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-            {slide.description}
+          
+          <p className="hero-pro-max__description">
+            منصة <strong>Sub4Links</strong> توفر لك أفضل الاشتراكات الرقمية، خدمات التصميم الاحترافية، والدورات التدريبية المتقدمة لتعزيز نجاحك بأعلى معايير الجودة.
           </p>
-          <div className="hero__actions animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-            <button className="btn btn-primary btn-lg hero__cta" id="hero-cta">
-              {slide.cta}
-              <ArrowLeft size={18} />
-            </button>
-            <button className="btn btn-secondary btn-lg hero__cta-secondary">
-              تصفح الخدمات
-            </button>
+          
+          <div className="hero-pro-max__actions">
+            <Link to="/shop" className="btn btn-primary btn-lg hero-pro-max__cta">
+              استكشف الخدمات
+              <ArrowLeft size={20} />
+            </Link>
+            <Link to="/contact" className="btn btn-secondary btn-lg hero-pro-max__cta-secondary">
+              تواصل معنا
+            </Link>
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="hero__stats animate-fade-in-up" style={{ animationDelay: '400ms' }}>
-          {stats.map((stat, index) => (
-            <div key={index} className="hero__stat-wrapper" style={{ display: 'flex', alignItems: 'center' }}>
-              <div className="hero__stat">
-                <span className="hero__stat-value">{stat.value}</span>
-                <span className="hero__stat-label">{stat.label}</span>
-              </div>
-              {index < stats.length - 1 && <div className="hero__stat-divider" />}
+        {/* Floating Glassmorphism Elements (Desktop primarily, scales down for mobile) */}
+        <div className="hero-pro-max__visuals">
+          <div className="hero-pro-max__card hero-pro-max__card--1">
+            <div className="card-icon" style={{ background: 'rgba(59, 130, 246, 0.2)', color: '#3B82F6' }}>
+              <Zap size={24} />
             </div>
-          ))}
-        </div>
-      </div>
+            <div className="card-info">
+              <h4>تسليم فوري</h4>
+              <p>لجميع الاشتراكات الرقمية</p>
+            </div>
+          </div>
+          
+          <div className="hero-pro-max__card hero-pro-max__card--2">
+            <div className="card-icon" style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#10B981' }}>
+              <ShieldCheck size={24} />
+            </div>
+            <div className="card-info">
+              <h4>ضمان الجودة</h4>
+              <p>خدمات موثوقة وآمنة 100%</p>
+            </div>
+          </div>
 
-      {/* Navigation */}
-      <div className="hero__nav">
-        <button
-          className="hero__nav-btn"
-          onClick={nextSlide}
-          aria-label="Previous slide"
-          disabled={isTransitioning}
-        >
-          <ChevronRight size={20} />
-        </button>
-        <div className="hero__dots">
-          {heroSlides.map((_, i) => (
-            <button
-              key={i}
-              className={`hero__dot ${i === currentSlide ? 'hero__dot--active' : ''}`}
-              onClick={() => goToSlide(i)}
-              aria-label={`Go to slide ${i + 1}`}
-            />
-          ))}
+          <div className="hero-pro-max__main-image">
+            {/* Using a futuristic glowing gradient element as a central visual if no image is available */}
+            <div className="hero-pro-max__main-glow"></div>
+            <div className="hero-pro-max__main-glow-inner"></div>
+          </div>
         </div>
-        <button
-          className="hero__nav-btn"
-          onClick={prevSlide}
-          aria-label="Next slide"
-          disabled={isTransitioning}
-        >
-          <ChevronLeft size={20} />
-        </button>
       </div>
     </section>
   );
