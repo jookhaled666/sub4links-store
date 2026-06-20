@@ -29,7 +29,7 @@ export default function CustomerLayout() {
   return (
     <div className="admin-layout">
       {/* Sidebar */}
-      <aside className="admin-sidebar" style={{ transform: 'none' }}>
+      <aside className="admin-sidebar">
         <div className="admin-sidebar__header">
           <Link to="/" className="admin-sidebar__logo">
             <img src="/company-icon.png" alt="Sub4Links Icon" className="admin-sidebar__logo-icon-img" />
