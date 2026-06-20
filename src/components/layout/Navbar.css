@@ -425,6 +425,7 @@
     padding-bottom: max(8px, env(safe-area-inset-bottom));
     justify-content: space-around;
     align-items: center;
+    transform: translateZ(0); /* Hardware acceleration to fix iOS touch target bug */
   }
 
   .bottom-nav__item {
@@ -443,6 +444,14 @@
     border: none;
     background: none;
     min-width: 52px;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    z-index: 10000;
+  }
+
+  /* Ensure child elements don't steal the click event */
+  .bottom-nav__item > * {
+    pointer-events: none;
   }
 
   .bottom-nav__item--active {
