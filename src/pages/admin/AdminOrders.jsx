@@ -1,14 +1,36 @@
 import { useState } from 'react';
-import { CheckCircle, Clock, X, Eye, ChevronDown, Search, Trash2 } from 'lucide-react';
+import { CheckCircle, Clock, X, Eye, Search, Trash2, Save } from 'lucide-react';
+
+/* Inline toast */
+function Toast({ msg }) {
+  if (!msg) return null;
+  return (
+    <div style={{
+      position: 'fixed', bottom: '2rem', left: '50%', transform: 'translateX(-50%)',
+      background: '#10B981', color: '#fff', padding: '0.75rem 1.75rem',
+      borderRadius: '999px', fontWeight: 700, fontSize: '0.9rem',
+      boxShadow: '0 4px 24px rgba(0,0,0,0.3)', zIndex: 9999,
+      animation: 'fadeIn 0.3s ease',
+    }}>
+      {msg}
+    </div>
+  );
+}
 import { useOrders } from '../../context/AppContext';
 
 const statusLabel = { completed: 'مكتمل ومفعّل', pending: 'قيد التفعيل', cancelled: 'ملغي' };
 
 export default function AdminOrders() {
   const { orders, updateOrderStatus, updateOrderDelivery, deleteOrder, allUsers } = useOrders();
-  const [search, setSearch] = useState('');
+  const [search, setSearch]           = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [viewOrder, setViewOrder] = useState(null);
+  const [viewOrder, setViewOrder]     = useState(null);
+  const [toastMsg, setToastMsg]       = useState('');
+
+  const showToast = (msg) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(''), 2800);
+  };
 
   // Form states for modal editing
   const [orderStatus, setOrderStatus] = useState('pending');
@@ -44,7 +66,7 @@ export default function AdminOrders() {
       deliveryDetails: deliveryForm
     }));
 
-    alert('تم حفظ وتحديث بيانات الاشتراك والتسجيل بنجاح! سيتم إخطار العميل فوراً.');
+    showToast('✅ تم حفظ بيانات التفعيل فوراً — العميل يمكنه رؤيتها الآن في حسابه!');
   };
 
   const filtered = orders.filter(o => {
@@ -68,6 +90,7 @@ export default function AdminOrders() {
 
   return (
     <div>
+      <Toast msg={toastMsg} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 className="admin-section-title">إدارة الطلبات والاشتراكات</h1>
@@ -269,10 +292,10 @@ export default function AdminOrders() {
 
               <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem', justifyContent: 'flex-end' }}>
                 <button type="button" className="btn btn-ghost" onClick={() => setViewOrder(null)}>
-                  إلغاء
+                  إغلاق
                 </button>
-                <button type="submit" className="btn btn-primary" style={{ padding: '0.6rem 2rem' }}>
-                  حفظ وتحديث الاشتراك
+                <button type="submit" className="btn btn-primary" style={{ padding: '0.6rem 2rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Save size={16} /> حفظ فوري وتحديث العميل
                 </button>
               </div>
             </form>

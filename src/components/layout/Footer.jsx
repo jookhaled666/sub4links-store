@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { MapPin, Phone, Mail } from 'lucide-react';
+import { Phone, Mail } from 'lucide-react';
 import './Footer.css';
 
 const FacebookIcon = () => (
@@ -22,9 +22,12 @@ export default function Footer() {
         <div className="footer__grid">
           {/* Brand */}
           <div className="footer__brand">
-            <Link to="/" className="footer__logo">
-              <img src="/company-icon.png" alt="Sub4Links Icon" className="footer__logo-icon-img" />
-              <img src="/company-logo.png" alt="Sub4Links Logo" className="footer__logo-text-img" />
+            <Link to="/" className="footer__logo" aria-label="Sub4Links الرئيسية">
+              <img
+                src="https://res.cloudinary.com/dojt3kryr/image/upload/v1782920227/sub4links_logo_white_gvqpsu.png"
+                alt="Sub4Links"
+                className="footer__logo-img"
+              />
             </Link>
             <p className="footer__desc">
               وجهتك الموثوقة للاشتراكات الرقمية وخدمات التصميم الاحترافية. جودة مضمونة مع دعم فني مستمر.
@@ -37,18 +40,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Columns */}
-          <div className="footer__col">
-            <h4 className="footer__heading">الخدمات</h4>
-            <ul className="footer__links">
-              <li><Link to="/subscriptions">الاشتراكات الرقمية</Link></li>
-              <li><Link to="/services">تصميم المواقع</Link></li>
-              <li><Link to="/services">تصميم اللوجوهات</Link></li>
-              <li><Link to="/courses">الدورات التدريبية</Link></li>
-              <li><Link to="/shop">جميع الخدمات</Link></li>
-            </ul>
-          </div>
-
+          {/* حسابي */}
           <div className="footer__col">
             <h4 className="footer__heading">حسابي</h4>
             <ul className="footer__links">
@@ -60,23 +52,33 @@ export default function Footer() {
             </ul>
           </div>
 
+          {/* الدعم */}
           <div className="footer__col">
             <h4 className="footer__heading">الدعم</h4>
             <ul className="footer__links">
               <li><Link to="/contact">مركز المساعدة</Link></li>
               <li><Link to="/contact">الأسئلة الشائعة</Link></li>
               <li><Link to="/refund">سياسة الاسترجاع</Link></li>
-              <li><Link to="/contact">اتصل بنا</Link></li>
-              <li><a href="https://wa.me/201234567890" target="_blank" rel="noreferrer">واتساب مباشر</a></li>
+              <li>
+                <a href="https://wa.me/201099599558" target="_blank" rel="noreferrer">
+                  واتساب مباشر
+                </a>
+              </li>
             </ul>
           </div>
 
+          {/* تواصل معنا — فقط هاتف + ايميل */}
           <div className="footer__col" id="contact">
             <h4 className="footer__heading">تواصل معنا</h4>
             <ul className="footer__contact-list">
-              <li><MapPin size={16} /><span>المعادي الجديدة، القاهرة، مصر</span></li>
-              <li><Phone size={16} /><a href="tel:+201234567890">+20 123 456 7890</a></li>
-              <li><Mail size={16} /><a href="mailto:support@sup4links.com">support@sup4links.com</a></li>
+              <li>
+                <Phone size={16} />
+                <a href="tel:+201099599558" dir="ltr">+20 1099599558</a>
+              </li>
+              <li>
+                <Mail size={16} />
+                <a href="mailto:support@sub4links.com">support@sub4links.com</a>
+              </li>
             </ul>
           </div>
         </div>

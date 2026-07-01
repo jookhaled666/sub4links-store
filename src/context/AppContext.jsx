@@ -1,39 +1,31 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { products as allProducts } from '../data/products';
 
-// ─────────────── Cart Context ───────────────
-const CartContext = createContext(null);
+// ─────────────── Storage Helpers ───────────────
+const LS_PRODUCTS_KEY = 's4l_products_v2';
+const LS_ORDERS_KEY   = 's4l_orders_v2';
 
-// ─────────────── Auth Context ───────────────
-const AuthContext = createContext(null);
+function loadFromLS(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) return JSON.parse(raw);
+  } catch (_) { /* ignore parse errors */ }
+  return fallback;
+}
 
-// ─────────────── Orders Context ───────────────
-const OrdersContext = createContext(null);
+function saveToLS(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch (_) {}
+}
 
-// ─────────── Fake users DB ───────────────
+// ─────────────── Contexts ───────────────
+const CartContext    = createContext(null);
+const AuthContext    = createContext(null);
+const OrdersContext  = createContext(null);
+
+// ─────────── Users DB ─────────────────
 const USERS = [
-  {
-    id: 1,
-    name: 'أدمن النظام',
-    email: 'admin@sup4links.com',
-    password: 'admin123',
-    role: 'admin',
-    phone: '01000000000',
-    address: 'القاهرة، مصر',
-    field: 'إدارة الأعمال',
-    gender: 'boy',
-  },
-  {
-    id: 2,
-    name: 'أحمد محمود',
-    email: 'user@sup4links.com',
-    password: 'user123',
-    role: 'customer',
-    phone: '01012345678',
-    address: 'الجيزة، مصر',
-    field: 'تطوير البرمجيات',
-    gender: 'boy',
-  },
+  { id: 1, name: 'أدمن النظام',  email: 'admin@sup4links.com', password: 'admin123', role: 'admin',    phone: '01000000000', address: 'القاهرة، مصر',  field: 'إدارة الأعمال',      gender: 'boy' },
+  { id: 2, name: 'أحمد محمود',   email: 'user@sup4links.com',  password: 'user123',  role: 'customer', phone: '01012345678', address: 'الجيزة، مصر',   field: 'تطوير البرمجيات',   gender: 'boy' },
 ];
 
 // ─────────────── SEED ORDERS ───────────────
@@ -45,6 +37,11 @@ const SEED_ORDERS = [
     items: [{ ...allProducts[7], qty: 1 }],
     total: allProducts[7].price,
     status: 'completed',
+    buyerName: 'أحمد محمود',
+    buyerEmail: 'user@sup4links.com',
+    buyerPhone: '01012345678',
+    payMethod: 'card',
+    deliveryDetails: null,
   },
   {
     id: 'ORD-002',
@@ -53,14 +50,20 @@ const SEED_ORDERS = [
     items: [{ ...allProducts[0], qty: 1 }, { ...allProducts[3], qty: 1 }],
     total: allProducts[0].price + allProducts[3].price,
     status: 'pending',
+    buyerName: 'أحمد محمود',
+    buyerEmail: 'user@sup4links.com',
+    buyerPhone: '01012345678',
+    payMethod: 'instapay',
+    deliveryDetails: null,
   },
 ];
 
 // ─────────────── PROVIDER ───────────────
 export function AppProvider({ children }) {
-  // ---------- Auth ----------
+
+  // ──── Auth ────
   const [currentUser, setCurrentUser] = useState(null);
-  const [authError, setAuthError] = useState('');
+  const [authError, setAuthError]     = useState('');
 
   const login = useCallback((email, password) => {
     const found = USERS.find(u => u.email === email && u.password === password);
@@ -73,16 +76,11 @@ export function AppProvider({ children }) {
     return { ok: false };
   }, []);
 
-  const logout = useCallback(() => {
-    setCurrentUser(null);
-  }, []);
+  const logout        = useCallback(() => setCurrentUser(null), []);
+  const updateProfile = useCallback((updates) => setCurrentUser(prev => ({ ...prev, ...updates })), []);
 
-  const updateProfile = useCallback((updates) => {
-    setCurrentUser(prev => ({ ...prev, ...updates }));
-  }, []);
-
-  // ---------- Cart ----------
-  const [cart, setCart] = useState([]);
+  // ──── Cart ────
+  const [cart, setCart]         = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
 
   const addToCart = useCallback((product) => {
@@ -94,9 +92,7 @@ export function AppProvider({ children }) {
     setCartOpen(true);
   }, []);
 
-  const removeFromCart = useCallback((id) => {
-    setCart(prev => prev.filter(i => i.id !== id));
-  }, []);
+  const removeFromCart = useCallback((id) => setCart(prev => prev.filter(i => i.id !== id)), []);
 
   const updateQty = useCallback((id, qty) => {
     if (qty < 1) { removeFromCart(id); return; }
@@ -104,11 +100,10 @@ export function AppProvider({ children }) {
   }, [removeFromCart]);
 
   const clearCart = useCallback(() => setCart([]), []);
-
   const cartTotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const cartCount = cart.reduce((s, i) => s + i.qty, 0);
 
-  // ---------- Wishlist ----------
+  // ──── Wishlist ────
   const [wishlist, setWishlist] = useState([]);
 
   const toggleWishlist = useCallback((product) => {
@@ -120,57 +115,113 @@ export function AppProvider({ children }) {
 
   const isWishlisted = useCallback((id) => wishlist.some(i => i.id === id), [wishlist]);
 
-  // ---------- Orders ----------
-  const [orders, setOrders] = useState(SEED_ORDERS);
+  // ──────────────────────────────────────────────────
+  //  PRODUCTS — persisted in localStorage
+  // ──────────────────────────────────────────────────
+  const [managedProducts, setManagedProducts] = useState(() =>
+    loadFromLS(LS_PRODUCTS_KEY, allProducts)
+  );
+
+  // Keep localStorage in sync on every change
+  useEffect(() => {
+    saveToLS(LS_PRODUCTS_KEY, managedProducts);
+  }, [managedProducts]);
+
+  const addProduct = useCallback((product) => {
+    const newP = { ...product, id: Date.now(), inStock: true, rating: 5.0, reviews: 0 };
+    setManagedProducts(prev => {
+      const next = [newP, ...prev];
+      saveToLS(LS_PRODUCTS_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const updateProduct = useCallback((id, updates) => {
+    setManagedProducts(prev => {
+      const next = prev.map(p => p.id === id ? { ...p, ...updates } : p);
+      saveToLS(LS_PRODUCTS_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const deleteProduct = useCallback((id) => {
+    setManagedProducts(prev => {
+      const next = prev.filter(p => p.id !== id);
+      saveToLS(LS_PRODUCTS_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const toggleStock = useCallback((id) => {
+    setManagedProducts(prev => {
+      const next = prev.map(p => p.id === id ? { ...p, inStock: !p.inStock } : p);
+      saveToLS(LS_PRODUCTS_KEY, next);
+      return next;
+    });
+  }, []);
+
+  // Reset products to original data (useful for admin)
+  const resetProducts = useCallback(() => {
+    localStorage.removeItem(LS_PRODUCTS_KEY);
+    setManagedProducts(allProducts);
+  }, []);
+
+  // ──────────────────────────────────────────────────
+  //  ORDERS — persisted in localStorage
+  // ──────────────────────────────────────────────────
+  const [orders, setOrders] = useState(() =>
+    loadFromLS(LS_ORDERS_KEY, SEED_ORDERS)
+  );
+
+  // Keep localStorage in sync on every change
+  useEffect(() => {
+    saveToLS(LS_ORDERS_KEY, orders);
+  }, [orders]);
 
   const placeOrder = useCallback((cartItems, total, userId, buyerDetails = {}) => {
     const newOrder = {
-      id: `ORD-${String(orders.length + 1).padStart(3, '0')}`,
+      id: `ORD-${String(Date.now()).slice(-6)}`,
       userId: userId || 2,
       date: new Date().toISOString().split('T')[0],
       items: cartItems,
       total,
       status: 'pending',
-      buyerName: buyerDetails.name || '',
-      buyerEmail: buyerDetails.email || '',
-      buyerPhone: buyerDetails.phone || '',
-      payMethod: buyerDetails.payMethod || 'card',
-      deliveryDetails: null, // details added by admin later (activation key, etc.)
+      buyerName:   buyerDetails.name      || '',
+      buyerEmail:  buyerDetails.email     || '',
+      buyerPhone:  buyerDetails.phone     || '',
+      payMethod:   buyerDetails.payMethod || 'card',
+      deliveryDetails: null,
     };
-    setOrders(prev => [newOrder, ...prev]);
+    setOrders(prev => {
+      const next = [newOrder, ...prev];
+      saveToLS(LS_ORDERS_KEY, next);
+      return next;
+    });
     return newOrder;
-  }, [orders]);
+  }, []);
 
   const updateOrderStatus = useCallback((orderId, status) => {
-    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
+    setOrders(prev => {
+      const next = prev.map(o => o.id === orderId ? { ...o, status } : o);
+      saveToLS(LS_ORDERS_KEY, next);
+      return next;
+    });
   }, []);
 
   const updateOrderDelivery = useCallback((orderId, deliveryDetails) => {
-    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, deliveryDetails } : o));
+    setOrders(prev => {
+      const next = prev.map(o => o.id === orderId ? { ...o, deliveryDetails } : o);
+      saveToLS(LS_ORDERS_KEY, next);
+      return next;
+    });
   }, []);
 
   const deleteOrder = useCallback((orderId) => {
-    setOrders(prev => prev.filter(o => o.id !== orderId));
-  }, []);
-
-  // ---------- Products management (Admin) ----------
-  const [managedProducts, setManagedProducts] = useState(allProducts);
-
-  const addProduct = useCallback((product) => {
-    const newP = { ...product, id: Date.now(), inStock: true, rating: 5.0, reviews: 0 };
-    setManagedProducts(prev => [newP, ...prev]);
-  }, []);
-
-  const updateProduct = useCallback((id, updates) => {
-    setManagedProducts(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
-  }, []);
-
-  const deleteProduct = useCallback((id) => {
-    setManagedProducts(prev => prev.filter(p => p.id !== id));
-  }, []);
-
-  const toggleStock = useCallback((id) => {
-    setManagedProducts(prev => prev.map(p => p.id === id ? { ...p, inStock: !p.inStock } : p));
+    setOrders(prev => {
+      const next = prev.filter(o => o.id !== orderId);
+      saveToLS(LS_ORDERS_KEY, next);
+      return next;
+    });
   }, []);
 
   return (
@@ -182,7 +233,7 @@ export function AppProvider({ children }) {
       }}>
         <OrdersContext.Provider value={{
           orders, placeOrder, updateOrderStatus, updateOrderDelivery, deleteOrder,
-          managedProducts, addProduct, updateProduct, deleteProduct, toggleStock,
+          managedProducts, addProduct, updateProduct, deleteProduct, toggleStock, resetProducts,
           allUsers: USERS,
         }}>
           {children}
@@ -193,6 +244,6 @@ export function AppProvider({ children }) {
 }
 
 // ─────────────── HOOKS ───────────────
-export const useAuth    = () => useContext(AuthContext);
-export const useCart    = () => useContext(CartContext);
-export const useOrders  = () => useContext(OrdersContext);
+export const useAuth   = () => useContext(AuthContext);
+export const useCart   = () => useContext(CartContext);
+export const useOrders = () => useContext(OrdersContext);

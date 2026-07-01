@@ -1,64 +1,99 @@
 /* ============================================================
-   Sup4Links E-Commerce — UI/UX Pro Max Design Tokens
-   Premium Dark Mode Aesthetic
+   Sup4Links E-Commerce — Design Tokens (Light Mode)
+   Font: Graphik Arabic
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+/* ── Graphik Arabic Font Face ── */
+@font-face {
+  font-family: 'Graphik Arabic';
+  src: url('/fonts/GraphikArabic-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Graphik Arabic';
+  src: url('/fonts/GraphikArabic-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Graphik Arabic';
+  src: url('/fonts/GraphikArabic-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Graphik Arabic';
+  src: url('/fonts/GraphikArabic-SemiBold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Graphik Arabic';
+  src: url('/fonts/GraphikArabic-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
-  /* ====== BRAND CORE (DARK & NEON) ====== */
-  --s4l-bg-base: #060608;
-  --s4l-bg-surface: #0C0C10;
-  --s4l-bg-elevated: #13131A;
-  --s4l-bg-glass: rgba(19, 19, 26, 0.6);
-  --s4l-bg-glass-heavy: rgba(6, 6, 8, 0.85);
+  /* ====== BRAND CORE (LIGHT MODE) ====== */
+  --s4l-bg-base:        #FFFFFF;
+  --s4l-bg-surface:     #F8F9FB;
+  --s4l-bg-elevated:    #F1F3F7;
+  --s4l-bg-glass:       rgba(255, 255, 255, 0.75);
+  --s4l-bg-glass-heavy: rgba(255, 255, 255, 0.95);
 
-  --s4l-accent-primary: #3B82F6; /* Rich Blue */
-  --s4l-accent-cyan: #06B6D4; /* Neon Cyan */
-  --s4l-accent-indigo: #6366F1; /* Deep Indigo */
-  --s4l-accent-purple: #8B5CF6; /* Vibrant Purple */
-  
-  --s4l-gold-500: #EAB308;
-  --s4l-gold-glow: rgba(234, 179, 8, 0.2);
+  --s4l-accent-primary: #2563EB;   /* Vivid Blue */
+  --s4l-accent-cyan:    #0EA5E9;   /* Sky Blue */
+  --s4l-accent-indigo:  #4F46E5;   /* Indigo */
+  --s4l-accent-purple:  #7C3AED;   /* Purple */
 
-  --s4l-text-primary: #FFFFFF;
-  --s4l-text-secondary: #A1A1AA;
-  --s4l-text-muted: #71717A;
+  --s4l-gold-500:    #D97706;
+  --s4l-gold-glow:   rgba(217, 119, 6, 0.15);
 
-  --s4l-border-subtle: rgba(255, 255, 255, 0.08);
-  --s4l-border-strong: rgba(255, 255, 255, 0.15);
-  --s4l-border-glow: rgba(59, 130, 246, 0.3);
+  --s4l-text-primary:   #0F172A;
+  --s4l-text-secondary: #475569;
+  --s4l-text-muted:     #94A3B8;
+
+  --s4l-border-subtle:  rgba(15, 23, 42, 0.08);
+  --s4l-border-strong:  rgba(15, 23, 42, 0.15);
+  --s4l-border-glow:    rgba(37, 99, 235, 0.25);
 
   /* Semantic colors */
-  --s4l-success: #10B981;
-  --s4l-success-bg: rgba(16, 185, 129, 0.1);
-  --s4l-warning: #F59E0B;
-  --s4l-warning-bg: rgba(245, 158, 11, 0.1);
-  --s4l-danger: #EF4444;
-  --s4l-danger-bg: rgba(239, 68, 68, 0.1);
-  --s4l-info: var(--s4l-accent-cyan);
-  --s4l-info-bg: rgba(6, 182, 212, 0.1);
+  --s4l-success:    #059669;
+  --s4l-success-bg: rgba(5, 150, 105, 0.08);
+  --s4l-warning:    #D97706;
+  --s4l-warning-bg: rgba(217, 119, 6, 0.08);
+  --s4l-danger:     #DC2626;
+  --s4l-danger-bg:  rgba(220, 38, 38, 0.08);
+  --s4l-info:       var(--s4l-accent-cyan);
+  --s4l-info-bg:    rgba(14, 165, 233, 0.08);
 
   /* Gradients */
-  --gradient-hero: linear-gradient(135deg, var(--s4l-bg-base) 0%, var(--s4l-bg-elevated) 100%);
-  --gradient-accent: linear-gradient(135deg, var(--s4l-accent-primary), var(--s4l-accent-cyan));
+  --gradient-hero:    linear-gradient(135deg, #EEF2FF 0%, #F0F9FF 100%);
+  --gradient-accent:  linear-gradient(135deg, var(--s4l-accent-primary), var(--s4l-accent-cyan));
   --gradient-premium: linear-gradient(135deg, var(--s4l-accent-indigo), var(--s4l-accent-purple));
-  --gradient-gold: linear-gradient(135deg, #FDE047 0%, #CA8A04 100%);
-  --gradient-glass: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+  --gradient-gold:    linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  --gradient-glass:   linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 100%);
 
   /* ====== SEMANTIC TOKENS ====== */
   --fg:           var(--s4l-text-primary);
   --fg-muted:     var(--s4l-text-secondary);
   --fg-subtle:    var(--s4l-text-muted);
-  --fg-inverse:   var(--s4l-bg-base);
-  --fg-brand:     var(--s4l-accent-cyan);
-  --fg-accent:    var(--s4l-accent-primary);
+  --fg-inverse:   #FFFFFF;
+  --fg-brand:     var(--s4l-accent-primary);
+  --fg-accent:    var(--s4l-accent-cyan);
 
   --bg:           var(--s4l-bg-base);
   --bg-subtle:    var(--s4l-bg-surface);
   --bg-muted:     var(--s4l-bg-elevated);
   --bg-brand:     var(--s4l-accent-primary);
-  --bg-brand-soft:rgba(59, 130, 246, 0.1);
+  --bg-brand-soft:rgba(37, 99, 235, 0.08);
   --bg-ink:       var(--s4l-text-primary);
 
   --border:       var(--s4l-border-subtle);
@@ -66,9 +101,11 @@
   --border-brand: var(--s4l-accent-primary);
 
   /* ====== TYPOGRAPHY ====== */
-  --font-primary: 'Cairo', system-ui, -apple-system, sans-serif;
-  --font-secondary: 'Cairo', sans-serif;
-  --font-mono:    'JetBrains Mono', 'Courier New', monospace;
+  --font-primary:   'Graphik Arabic', system-ui, -apple-system, sans-serif;
+  --font-secondary: 'Graphik Arabic', sans-serif;
+  --font-display:   'Graphik Arabic', system-ui, sans-serif;
+  --font-sans:      'Graphik Arabic', system-ui, sans-serif;
+  --font-mono:      'JetBrains Mono', 'Courier New', monospace;
 
   --fs-11: 0.6875rem;
   --fs-12: 0.75rem;
@@ -84,16 +121,16 @@
   --fs-60: 3.75rem;
   --fs-72: 4.5rem;
 
-  --lh-tight: 1.05;
-  --lh-snug:  1.2;
-  --lh-body:  1.6;
-  --lh-loose: 1.8;
+  --lh-tight: 1.15;
+  --lh-snug:  1.3;
+  --lh-body:  1.7;
+  --lh-loose: 1.9;
 
   --tracking-tight:  -0.02em;
   --tracking-snug:   -0.01em;
   --tracking-normal: 0;
-  --tracking-wide:   0.03em;
-  --tracking-caps:   0.1em;
+  --tracking-wide:   0.02em;
+  --tracking-caps:   0.08em;
 
   /* ====== SPACING ====== */
   --sp-1:  4px;
@@ -111,87 +148,98 @@
   --sp-32: 128px;
 
   /* ====== RADII ====== */
-  --r-xs: 6px;
-  --r-sm: 8px;
-  --r-md: 12px;
-  --r-lg: 16px;
-  --r-xl: 24px;
+  --r-xs:  6px;
+  --r-sm:  8px;
+  --r-md:  12px;
+  --r-lg:  16px;
+  --r-xl:  24px;
   --r-2xl: 32px;
-  --r-pill: 999px;
+  --r-pill:999px;
 
-  /* ====== SHADOWS & GLOWS ====== */
-  --shadow-xs: 0 1px 2px rgba(0,0,0,0.5);
-  --shadow-sm: 0 2px 4px rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.3);
-  --shadow-md: 0 8px 16px -4px rgba(0,0,0,0.6), 0 4px 8px rgba(0,0,0,0.4);
-  --shadow-lg: 0 16px 32px -8px rgba(0,0,0,0.7), 0 8px 16px rgba(0,0,0,0.5);
-  --shadow-xl: 0 32px 64px -16px rgba(0,0,0,0.8);
-  
-  --glow-brand: 0 0 24px rgba(6, 182, 212, 0.4);
-  --glow-premium: 0 0 32px rgba(99, 102, 241, 0.4);
-  --glow-gold: 0 0 24px rgba(234, 179, 8, 0.3);
+  /* ====== SHADOWS (light-mode) ====== */
+  --shadow-xs: 0 1px 3px rgba(15, 23, 42, 0.06);
+  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.10), 0 4px 8px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 16px 40px rgba(15, 23, 42, 0.12), 0 8px 16px rgba(15, 23, 42, 0.07);
+  --shadow-xl: 0 32px 64px rgba(15, 23, 42, 0.15);
+
+  --glow-brand:   0 0 20px rgba(37, 99, 235, 0.20);
+  --glow-premium: 0 0 28px rgba(79, 70, 229, 0.20);
+  --glow-gold:    0 0 20px rgba(217, 119, 6, 0.15);
 
   /* ====== MOTION ====== */
-  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-out:    cubic-bezier(0.2, 0.8, 0.2, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --dur-fast: 150ms;
-  --dur: 300ms;
+  --dur:      300ms;
   --dur-slow: 500ms;
 
   /* ====== Z-INDEX ====== */
   --z-dropdown: 100;
-  --z-sticky: 200;
-  --z-overlay: 300;
-  --z-modal: 400;
-  --z-toast: 500;
+  --z-sticky:   200;
+  --z-overlay:  300;
+  --z-modal:    400;
+  --z-toast:    500;
 }
 
-/* Animations */
+/* ── Animations ── */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideRight {
+  from { opacity: 0; transform: translateX(-30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
 @keyframes pulseGlow {
-  0% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(6, 182, 212, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0); }
+  0%   { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.3); }
+  70%  { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
 }
-
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-8px); }
+  100% { transform: translateY(0); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes marqueeScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33%       { transform: translateY(-6px) rotate(1deg); }
+  66%       { transform: translateY(-3px) rotate(-1deg); }
 }
 
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
+.animate-fade-in     { animation: fadeIn var(--dur-slow) var(--ease-out) forwards; }
+.animate-fade-in-up  { animation: fadeInUp var(--dur-slow) var(--ease-out) forwards; }
+.animate-slide-right { animation: slideRight var(--dur-slow) var(--ease-out) forwards; }
+.animate-float       { animation: float 5s ease-in-out infinite; }
 
-.animate-fade-in {
-  animation: fadeIn var(--dur-slow) var(--ease-out) forwards;
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-/* Global resets for new dark mode */
+/* ── Global base ── */
 body {
   background-color: var(--bg);
   color: var(--fg);
   font-family: var(--font-primary);
   -webkit-font-smoothing: antialiased;
+  direction: rtl;
 }
 
 ::selection {
-  background: var(--s4l-accent-cyan);
+  background: var(--s4l-accent-primary);
   color: #fff;
 }
 
-/* Glassmorphism utilities */
+/* ── Glassmorphism utilities ── */
 .glass-panel {
   background: var(--s4l-bg-glass);
   backdrop-filter: blur(16px);
@@ -199,7 +247,6 @@ body {
   border: 1px solid var(--border);
   box-shadow: var(--shadow-md);
 }
-
 .glass-panel-heavy {
   background: var(--s4l-bg-glass-heavy);
   backdrop-filter: blur(24px);
@@ -207,21 +254,19 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
-/* Premium Text Gradients */
+/* ── Text Gradients ── */
 .text-gradient {
   background: var(--gradient-accent);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-
 .text-gradient-premium {
   background: var(--gradient-premium);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-
 .text-gradient-gold {
   background: var(--gradient-gold);
   -webkit-background-clip: text;

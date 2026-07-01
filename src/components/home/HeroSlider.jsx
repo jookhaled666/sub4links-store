@@ -1,72 +1,105 @@
-import { ArrowLeft, Sparkles, ShieldCheck, Zap } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import './HeroSlider.css';
 
+const APP_ICONS = [
+  { name: 'ChatGPT',        emoji: '🤖', color: '#10A37F', bg: '#ECFDF5' },
+  { name: 'Gemini',         emoji: '✨', color: '#4285F4', bg: '#EFF6FF' },
+  { name: 'Claude',         emoji: '🧠', color: '#CC6633', bg: '#FFF7ED' },
+  { name: 'Canva',          emoji: '🎨', color: '#00C4CC', bg: '#ECFEFF' },
+  { name: 'Adobe',          emoji: '🅰',  color: '#FF0000', bg: '#FEF2F2' },
+  { name: 'LinkedIn',       emoji: '💼', color: '#0A66C2', bg: '#EFF6FF' },
+  { name: 'Notion',         emoji: '📝', color: '#000000', bg: '#F8FAFC' },
+  { name: 'Figma',          emoji: '🖌',  color: '#F24E1E', bg: '#FFF7ED' },
+  { name: 'YouTube',        emoji: '▶',  color: '#FF0000', bg: '#FEF2F2' },
+  { name: 'Microsoft',      emoji: '🪟', color: '#0078D4', bg: '#EFF6FF' },
+  { name: 'Envato',         emoji: '🌿', color: '#82B541', bg: '#F0FDF4' },
+  { name: 'Freepik',        emoji: '🖼',  color: '#1273EB', bg: '#EFF6FF' },
+  { name: 'Gamma',          emoji: '⚡', color: '#7C3AED', bg: '#F5F3FF' },
+  { name: 'ElevenLabs',     emoji: '🔊', color: '#111827', bg: '#F8FAFC' },
+  { name: 'CapCut',         emoji: '🎬', color: '#000000', bg: '#F8FAFC' },
+  { name: 'Midjourney',     emoji: '🎭', color: '#5865F2', bg: '#EEF2FF' },
+];
+
 export default function HeroSlider() {
   return (
-    <section className="hero-pro-max" id="hero-section">
-      {/* Dynamic Background Effects */}
-      <div className="hero-pro-max__bg">
-        <div className="hero-pro-max__orb hero-pro-max__orb--1"></div>
-        <div className="hero-pro-max__orb hero-pro-max__orb--2"></div>
-        <div className="hero-pro-max__orb hero-pro-max__orb--3"></div>
-        <div className="hero-pro-max__grid"></div>
+    <section className="hero-light" id="hero-section">
+      {/* Subtle gradient background */}
+      <div className="hero-light__bg" aria-hidden="true">
+        <div className="hero-light__blob hero-light__blob--1"></div>
+        <div className="hero-light__blob hero-light__blob--2"></div>
       </div>
 
-      <div className="hero-pro-max__container container">
-        {/* Main Content */}
-        <div className="hero-pro-max__content">
-          <div className="hero-pro-max__badge">
-            <Sparkles size={16} className="hero-pro-max__badge-icon" />
-            <span>مستقبل الخدمات الرقمية</span>
+      <div className="hero-light__container container">
+        {/* Left Content */}
+        <div className="hero-light__content">
+          <div className="hero-light__badge">
+            <Sparkles size={14} />
+            <span>منصة الخدمات الرقمية #1 في مصر</span>
           </div>
-          
-          <h1 className="hero-pro-max__title">
-            ارتقِ بعملك إلى <br />
-            <span className="text-gradient-premium">المستوى التالي</span>
+
+          <h1 className="hero-light__title">
+            كل الاشتراكات الرقمية
+            <span className="text-gradient-premium"> في مكان واحد</span>
           </h1>
-          
-          <p className="hero-pro-max__description">
-            منصة <strong>Sub4Links</strong> توفر لك أفضل الاشتراكات الرقمية، خدمات التصميم الاحترافية، والدورات التدريبية المتقدمة لتعزيز نجاحك بأعلى معايير الجودة.
+
+          <p className="hero-light__desc">
+            Sub4Links وجهتك الموثوقة للحصول على أفضل الاشتراكات الرقمية وخدمات التصميم الاحترافية بأسعار تنافسية وجودة مضمونة.
           </p>
-          
-          <div className="hero-pro-max__actions">
-            <Link to="/shop" className="btn btn-primary btn-lg hero-pro-max__cta">
-              استكشف الخدمات
-              <ArrowLeft size={20} />
+
+          <div className="hero-light__actions">
+            <Link to="/shop" className="btn btn-primary btn-lg">
+              تصفح الخدمات
+              <ArrowLeft size={18} />
             </Link>
-            <Link to="/contact" className="btn btn-secondary btn-lg hero-pro-max__cta-secondary">
+            <a
+              href="https://wa.me/201099599558"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-secondary btn-lg"
+            >
               تواصل معنا
-            </Link>
+            </a>
+          </div>
+
+          <div className="hero-light__stats">
+            <div className="hero-stat">
+              <span className="hero-stat__num">+500</span>
+              <span className="hero-stat__label">عميل راضٍ</span>
+            </div>
+            <div className="hero-stat__divider"></div>
+            <div className="hero-stat">
+              <span className="hero-stat__num">+50</span>
+              <span className="hero-stat__label">خدمة رقمية</span>
+            </div>
+            <div className="hero-stat__divider"></div>
+            <div className="hero-stat">
+              <span className="hero-stat__num">24/7</span>
+              <span className="hero-stat__label">دعم فني</span>
+            </div>
           </div>
         </div>
 
-        {/* Floating Glassmorphism Elements (Desktop primarily, scales down for mobile) */}
-        <div className="hero-pro-max__visuals">
-          <div className="hero-pro-max__card hero-pro-max__card--1">
-            <div className="card-icon" style={{ background: 'rgba(59, 130, 246, 0.2)', color: '#3B82F6' }}>
-              <Zap size={24} />
-            </div>
-            <div className="card-info">
-              <h4>تسليم فوري</h4>
-              <p>لجميع الاشتراكات الرقمية</p>
-            </div>
-          </div>
-          
-          <div className="hero-pro-max__card hero-pro-max__card--2">
-            <div className="card-icon" style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#10B981' }}>
-              <ShieldCheck size={24} />
-            </div>
-            <div className="card-info">
-              <h4>ضمان الجودة</h4>
-              <p>خدمات موثوقة وآمنة 100%</p>
-            </div>
-          </div>
-
-          <div className="hero-pro-max__main-image">
-            {/* Using a futuristic glowing gradient element as a central visual if no image is available */}
-            <div className="hero-pro-max__main-glow"></div>
-            <div className="hero-pro-max__main-glow-inner"></div>
+        {/* Right: App Icons Grid */}
+        <div className="hero-light__icons" aria-label="الخدمات المتاحة">
+          <div className="icons-grid">
+            {APP_ICONS.map((app, i) => (
+              <div
+                key={app.name}
+                className="icon-pill"
+                style={{
+                  '--icon-bg': app.bg,
+                  '--icon-color': app.color,
+                  animationDelay: `${i * 0.08}s`,
+                }}
+                title={app.name}
+              >
+                <span className="icon-pill__emoji" style={{ color: app.color }}>
+                  {app.emoji}
+                </span>
+                <span className="icon-pill__name">{app.name}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

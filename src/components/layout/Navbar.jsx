@@ -37,9 +37,13 @@ export default function Navbar() {
       <nav className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`} id="main-nav">
         <div className="navbar__inner container">
           {/* Logo */}
-          <Link to="/" className="navbar__logo" aria-label="Sup4Links Store Home">
-            <img src="/company-icon.png" alt="Sub4Links Icon" className="navbar__logo-icon-img" />
-            <img src="/company-logo.png" alt="Sub4Links Logo" className="navbar__logo-text-img" />
+          <Link to="/" className="navbar__logo" aria-label="Sub4Links الرئيسية">
+            <img
+              src="https://res.cloudinary.com/dojt3kryr/image/upload/v1782920227/sub4links_logo_white_gvqpsu.png"
+              alt="Sub4Links"
+              className="navbar__logo-img"
+              style={{ filter: 'none', height: '38px' }}
+            />
           </Link>
 
           {/* Desktop Nav */}
@@ -54,13 +58,16 @@ export default function Navbar() {
               </button>
               <div className="navbar__dropdown-menu">
                 <Link to="/subscriptions" className="navbar__dropdown-item">
-                  <Globe size={16} /> الاشتراكات الرقمية
+                  <Globe size={15} /> الاشتراكات الرقمية
                 </Link>
                 <Link to="/services" className="navbar__dropdown-item">
-                  <Zap size={16} /> خدمات التصميم
+                  <Zap size={15} /> تصميم المواقع
+                </Link>
+                <Link to="/services" className="navbar__dropdown-item">
+                  <BookOpen size={15} /> تصميم اللوجوهات
                 </Link>
                 <Link to="/courses" className="navbar__dropdown-item">
-                  <BookOpen size={16} /> الدورات التدريبية
+                  <BookOpen size={15} /> الدورات التدريبية
                 </Link>
                 <Link to="/shop" className="navbar__dropdown-item navbar__dropdown-item--all">
                   عرض الكل ←
@@ -87,13 +94,13 @@ export default function Navbar() {
               aria-label="Search products"
               id="search-toggle"
             >
-              <Search size={20} />
+              <Search size={18} />
             </button>
 
             <Link to="/wishlist" className="navbar__action-btn navbar__wishlist-btn" aria-label="Wishlist" id="wishlist-btn">
-              <Heart size={20} />
+              <Heart size={18} />
               {wishlist.length > 0 && (
-                <span className="navbar__cart-count" style={{ background: '#ef4444' }}>{wishlist.length}</span>
+                <span className="navbar__cart-count">{wishlist.length}</span>
               )}
             </Link>
 
@@ -103,7 +110,7 @@ export default function Navbar() {
               id="cart-btn"
               onClick={() => setCartOpen(true)}
             >
-              <ShoppingBag size={20} />
+              <ShoppingBag size={18} />
               {cartCount > 0 && (
                 <span className="navbar__cart-count" aria-label={`${cartCount} items in cart`}>
                   {cartCount}
@@ -111,8 +118,8 @@ export default function Navbar() {
               )}
             </button>
 
-            <Link to="/customer" className="navbar__action-btn navbar__user-btn" aria-label="Account" id="account-btn">
-              <User size={20} />
+            <Link to="/customer" className="navbar__action-btn navbar__user-btn" aria-label="حسابي" id="account-btn">
+              <User size={18} />
             </Link>
 
             <button
@@ -166,9 +173,13 @@ export default function Navbar() {
           <div className="mobile-menu__overlay" onClick={() => setMenuOpen(false)} />
           <div className="mobile-menu__panel animate-slide-right">
             <div className="mobile-menu__header">
-              <Link to="/" className="navbar__logo" style={{ gap: '6px' }}>
-                <img src="/company-icon.png" alt="Sub4Links Icon" className="navbar__logo-icon-img" style={{ height: '32px' }} />
-                <img src="/company-logo.png" alt="Sub4Links Logo" className="navbar__logo-text-img" style={{ height: '24px' }} />
+              <Link to="/" className="navbar__logo">
+                <img
+                  src="https://res.cloudinary.com/dojt3kryr/image/upload/v1782920227/sub4links_logo_white_gvqpsu.png"
+                  alt="Sub4Links"
+                  className="navbar__logo-img"
+                  style={{ filter: 'none', height: '34px' }}
+                />
               </Link>
               <button onClick={() => setMenuOpen(false)} aria-label="Close menu">
                 <X size={22} />

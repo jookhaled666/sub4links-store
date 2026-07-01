@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Send, MapPin, Phone, Mail, MessageCircle, CheckCircle } from 'lucide-react';
+import { Send, Phone, Mail, MessageCircle, CheckCircle } from 'lucide-react';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import './ContactPage.css';
@@ -43,30 +43,23 @@ export default function ContactPage() {
             <div className="contact-info">
               {/* Cards */}
               <div className="contact-info-card">
-                <div className="contact-info-icon"><MapPin size={22} /></div>
-                <div>
-                  <h4>موقعنا</h4>
-                  <p>المعادي الجديدة، القاهرة، مصر</p>
-                </div>
-              </div>
-              <div className="contact-info-card">
                 <div className="contact-info-icon phone"><Phone size={22} /></div>
                 <div>
                   <h4>رقم الهاتف</h4>
-                  <p dir="ltr">+20 100 000 0000</p>
+                  <p dir="ltr"><a href="tel:+201099599558">+20 1099599558</a></p>
                 </div>
               </div>
               <div className="contact-info-card">
                 <div className="contact-info-icon mail"><Mail size={22} /></div>
                 <div>
                   <h4>البريد الإلكتروني</h4>
-                  <p>support@sup4links.com</p>
+                  <p><a href="mailto:support@sub4links.com">support@sub4links.com</a></p>
                 </div>
               </div>
 
               {/* WhatsApp CTA */}
               <a
-                href="https://wa.me/20100000000"
+                href="https://wa.me/201099599558"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="whatsapp-cta"
@@ -75,18 +68,7 @@ export default function ContactPage() {
                 تواصل عبر واتساب
               </a>
 
-              {/* Map */}
-              <div className="contact-map">
-                <iframe
-                  title="موقع Sub4Links"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3456.5!2d31.25!3d29.97!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjnCsDU4JzEyLjAiTiAzMcKwMTUnMDAuMCJF!5e0!3m2!1sar!2seg!4v1600000000000"
-                  width="100%"
-                  height="220"
-                  style={{ border: 0, borderRadius: '1rem', filter: 'invert(90%) hue-rotate(180deg)' }}
-                  allowFullScreen
-                  loading="lazy"
-                />
-              </div>
+
             </div>
 
             {/* Form Column */}
