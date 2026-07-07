@@ -125,6 +125,14 @@
 }
 .contact-form select option { background: #13131A; }
 
+.field-error {
+  display: block;
+  color: #ef4444;
+  font-size: 0.78rem;
+  margin-top: 0.3rem;
+  font-weight: 500;
+}
+
 .contact-submit-btn {
   display: flex;
   align-items: center;

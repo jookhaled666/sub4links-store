@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useForm, ValidationError } from '@formspree/react';
 import { Send, Phone, Mail, MessageCircle, CheckCircle } from 'lucide-react';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
@@ -10,42 +10,9 @@ const WhatsAppIcon = () => (
   </svg>
 );
 
-const FORMSPREE_URL = 'https://formspree.io/f/xyzgdwbp'; // endpoint → info@sub4links.com
-
 export default function ContactPage() {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
-  const [sent, setSent] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    try {
-      const res = await fetch(FORMSPREE_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          phone: form.phone,
-          subject: form.subject,
-          message: form.message,
-        }),
-      });
-      if (res.ok) {
-        setSent(true);
-        setForm({ name: '', email: '', phone: '', subject: '', message: '' });
-      } else {
-        setError('حدث خطأ أثناء الإرسال. حاول مرة أخرى أو تواصل معنا عبر الواتساب.');
-      }
-    } catch {
-      setError('تعذّر الاتصال بالخادم. تحقق من اتصالك بالإنترنت.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // ── Formspree React hook — form ID: mkolarad → info@sub4links.com ──
+  const [state, handleSubmit] = useForm('mkolarad');
 
   return (
     <>
@@ -61,14 +28,13 @@ export default function ContactPage() {
           </div>
 
           <div className="contact-layout">
-            {/* Info Column */}
+            {/* ── Info Column ── */}
             <div className="contact-info">
-              {/* Cards */}
               <div className="contact-info-card">
                 <div className="contact-info-icon phone"><Phone size={22} /></div>
                 <div>
                   <h4>رقم الهاتف</h4>
-                  <p dir="ltr"><a href="tel:+201099599558">+20 1099599558</a></p>
+                  <p dir="ltr"><a href="tel:+201055899599">+20 1055899599</a></p>
                 </div>
               </div>
               <div className="contact-info-card">
@@ -89,20 +55,22 @@ export default function ContactPage() {
                 <WhatsAppIcon />
                 تواصل عبر واتساب
               </a>
-
-
             </div>
 
-            {/* Form Column */}
+            {/* ── Form Column ── */}
             <div className="contact-form-wrap">
-              {sent ? (
+              {state.succeeded ? (
+                /* ── SUCCESS STATE ── */
                 <div className="contact-success">
                   <CheckCircle size={56} className="success-icon" />
-                  <h2>تم إرسال رسالتك بنجاح!</h2>
-                  <p>سيتواصل معك فريقنا في أقرب وقت ممكن. شكراً لتواصلك معنا.</p>
-                  <button className="btn btn-primary" onClick={() => setSent(false)}>إرسال رسالة أخرى</button>
+                  <h2>تم إرسال رسالتك بنجاح! 🎉</h2>
+                  <p>سيتواصل معك فريقنا في أقرب وقت ممكن على بريدك الإلكتروني أو عبر الواتساب.</p>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--fg-muted)', marginTop: '0.5rem' }}>
+                    شكراً لتواصلك مع Sub4Links ❤️
+                  </p>
                 </div>
               ) : (
+                /* ── FORM ── */
                 <form className="contact-form" onSubmit={handleSubmit}>
                   <h2 className="form-title">
                     <MessageCircle size={22} />
@@ -111,41 +79,43 @@ export default function ContactPage() {
 
                   <div className="form-row">
                     <div className="form-group">
-                      <label>الاسم الكامل <span>*</span></label>
+                      <label htmlFor="name">الاسم الكامل <span>*</span></label>
                       <input
+                        id="name"
                         type="text"
+                        name="name"
                         placeholder="اسمك الكريم"
-                        value={form.name}
-                        onChange={e => setForm({...form, name: e.target.value})}
                         required
                       />
+                      <ValidationError field="name" prefix="الاسم" errors={state.errors} className="field-error" />
                     </div>
                     <div className="form-group">
-                      <label>البريد الإلكتروني <span>*</span></label>
+                      <label htmlFor="email">البريد الإلكتروني <span>*</span></label>
                       <input
+                        id="email"
                         type="email"
+                        name="email"
                         placeholder="email@example.com"
-                        value={form.email}
-                        onChange={e => setForm({...form, email: e.target.value})}
                         required
                       />
+                      <ValidationError field="email" prefix="البريد الإلكتروني" errors={state.errors} className="field-error" />
                     </div>
                   </div>
 
                   <div className="form-row">
                     <div className="form-group">
-                      <label>رقم الهاتف</label>
+                      <label htmlFor="phone">رقم الهاتف / واتساب</label>
                       <input
+                        id="phone"
                         type="tel"
+                        name="phone"
                         placeholder="01XXXXXXXXX"
-                        value={form.phone}
-                        onChange={e => setForm({...form, phone: e.target.value})}
                         dir="ltr"
                       />
                     </div>
                     <div className="form-group">
-                      <label>الموضوع <span>*</span></label>
-                      <select value={form.subject} onChange={e => setForm({...form, subject: e.target.value})} required>
+                      <label htmlFor="subject">الموضوع <span>*</span></label>
+                      <select id="subject" name="subject" required>
                         <option value="">اختر الموضوع</option>
                         <option value="subscription">استفسار عن اشتراك</option>
                         <option value="service">طلب خدمة</option>
@@ -153,28 +123,43 @@ export default function ContactPage() {
                         <option value="support">دعم فني</option>
                         <option value="other">أخرى</option>
                       </select>
+                      <ValidationError field="subject" prefix="الموضوع" errors={state.errors} className="field-error" />
                     </div>
                   </div>
 
                   <div className="form-group">
-                    <label>رسالتك <span>*</span></label>
+                    <label htmlFor="message">رسالتك <span>*</span></label>
                     <textarea
+                      id="message"
+                      name="message"
                       rows="5"
                       placeholder="اكتب رسالتك هنا..."
-                      value={form.message}
-                      onChange={e => setForm({...form, message: e.target.value})}
                       required
                     />
+                    <ValidationError field="message" prefix="الرسالة" errors={state.errors} className="field-error" />
                   </div>
 
-                  {error && (
-                    <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '0.75rem', padding: '0.75rem 1rem', color: '#ef4444', fontSize: '0.875rem', marginBottom: '1rem' }}>
-                      {error}
+                  {/* General form-level errors */}
+                  {state.errors && state.errors.length > 0 && !state.errors.some(e => e.field) && (
+                    <div style={{
+                      background: 'rgba(239,68,68,0.08)',
+                      border: '1px solid rgba(239,68,68,0.2)',
+                      borderRadius: '0.75rem',
+                      padding: '0.75rem 1rem',
+                      color: '#ef4444',
+                      fontSize: '0.875rem',
+                      marginBottom: '1rem',
+                    }}>
+                      حدث خطأ أثناء الإرسال. حاول مرة أخرى أو تواصل معنا عبر الواتساب.
                     </div>
                   )}
 
-                  <button type="submit" className="contact-submit-btn" disabled={loading}>
-                    {loading ? (
+                  <button
+                    type="submit"
+                    className="contact-submit-btn"
+                    disabled={state.submitting}
+                  >
+                    {state.submitting ? (
                       <span className="spinner" />
                     ) : (
                       <>
