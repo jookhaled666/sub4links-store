@@ -1,4 +1,4 @@
-import { useForm, ValidationError } from '@formspree/react';
+import React, { useState } from 'react';
 import { Send, Phone, Mail, MessageCircle, CheckCircle } from 'lucide-react';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
@@ -11,8 +11,44 @@ const WhatsAppIcon = () => (
 );
 
 export default function ContactPage() {
-  // ── Formspree React hook — form ID: mkolarad → info@sub4links.com ──
-  const [state, handleSubmit] = useForm('mkolarad');
+  const [submitting, setSubmitting] = useState(false);
+  const [succeeded, setSucceeded] = useState(false);
+  const [errors, setErrors] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setErrors(null);
+    
+    const form = e.target;
+    const data = new FormData(form);
+
+    try {
+      const response = await fetch("https://formspree.io/f/mkolarad", {
+        method: 'POST',
+        body: data,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        setSucceeded(true);
+        form.reset();
+      } else {
+        const responseData = await response.json();
+        if (Object.hasOwn(responseData, 'errors')) {
+          setErrors(responseData.errors.map(err => err.message).join(" | "));
+        } else {
+          setErrors("حدث خطأ غير متوقع. حاول مرة أخرى.");
+        }
+      }
+    } catch (error) {
+      setErrors("فشل الاتصال بالخادم. تأكد من اتصالك بالإنترنت.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -59,7 +95,7 @@ export default function ContactPage() {
 
             {/* ── Form Column ── */}
             <div className="contact-form-wrap">
-              {state.succeeded ? (
+              {succeeded ? (
                 /* ── SUCCESS STATE ── */
                 <div className="contact-success">
                   <CheckCircle size={56} className="success-icon" />
@@ -68,6 +104,13 @@ export default function ContactPage() {
                   <p style={{ fontSize: '0.85rem', color: 'var(--fg-muted)', marginTop: '0.5rem' }}>
                     شكراً لتواصلك مع Sub4Links ❤️
                   </p>
+                  <button 
+                    className="btn btn-secondary" 
+                    style={{ marginTop: '1.5rem', width: '100%' }}
+                    onClick={() => setSucceeded(false)}
+                  >
+                    إرسال رسالة أخرى
+                  </button>
                 </div>
               ) : (
                 /* ── FORM ── */
@@ -87,7 +130,6 @@ export default function ContactPage() {
                         placeholder="اسمك الكريم"
                         required
                       />
-                      <ValidationError field="name" prefix="الاسم" errors={state.errors} className="field-error" />
                     </div>
                     <div className="form-group">
                       <label htmlFor="email">البريد الإلكتروني <span>*</span></label>
@@ -98,7 +140,6 @@ export default function ContactPage() {
                         placeholder="email@example.com"
                         required
                       />
-                      <ValidationError field="email" prefix="البريد الإلكتروني" errors={state.errors} className="field-error" />
                     </div>
                   </div>
 
@@ -123,7 +164,6 @@ export default function ContactPage() {
                         <option value="support">دعم فني</option>
                         <option value="other">أخرى</option>
                       </select>
-                      <ValidationError field="subject" prefix="الموضوع" errors={state.errors} className="field-error" />
                     </div>
                   </div>
 
@@ -136,11 +176,10 @@ export default function ContactPage() {
                       placeholder="اكتب رسالتك هنا..."
                       required
                     />
-                    <ValidationError field="message" prefix="الرسالة" errors={state.errors} className="field-error" />
                   </div>
 
                   {/* General form-level errors */}
-                  {state.errors && state.errors.length > 0 && !state.errors.some(e => e.field) && (
+                  {errors && (
                     <div style={{
                       background: 'rgba(239,68,68,0.08)',
                       border: '1px solid rgba(239,68,68,0.2)',
@@ -149,17 +188,21 @@ export default function ContactPage() {
                       color: '#ef4444',
                       fontSize: '0.875rem',
                       marginBottom: '1rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.25rem'
                     }}>
-                      حدث خطأ أثناء الإرسال. حاول مرة أخرى أو تواصل معنا عبر الواتساب.
+                      <strong>حدث خطأ أثناء الإرسال:</strong>
+                      <span>{errors}</span>
                     </div>
                   )}
 
                   <button
                     type="submit"
                     className="contact-submit-btn"
-                    disabled={state.submitting}
+                    disabled={submitting}
                   >
-                    {state.submitting ? (
+                    {submitting ? (
                       <span className="spinner" />
                     ) : (
                       <>
