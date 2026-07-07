@@ -47,7 +47,7 @@ export default function ContactPage() {
 
               {/* WhatsApp CTA */}
               <a
-                href="https://wa.me/201055899599"
+                href="https://api.whatsapp.com/send/?phone=201055899599&text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%D8%8C%20%D8%A3%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%83%D9%85%20%D9%85%D9%86%20%D8%B5%D9%81%D8%AD%D8%A9%20%D8%A7%D8%AA%D8%B5%D9%84%20%D8%A8%D9%86%D8%A7&type=phone_number&app_absent=0"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="whatsapp-cta"
