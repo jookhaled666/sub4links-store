@@ -186,10 +186,12 @@ export function AppProvider({ children }) {
       items: cartItems,
       total,
       status: 'pending',
-      buyerName:   buyerDetails.name      || '',
-      buyerEmail:  buyerDetails.email     || '',
-      buyerPhone:  buyerDetails.phone     || '',
-      payMethod:   buyerDetails.payMethod || 'card',
+      buyerName:      buyerDetails.name          || '',
+      buyerEmail:     buyerDetails.email         || '',
+      buyerPhone:     buyerDetails.phone         || '',
+      payMethod:      buyerDetails.payMethod     || 'instapay',
+      paymentProof:   buyerDetails.paymentProof  || null,   // صورة الإيصال base64
+      paymentStatus:  buyerDetails.paymentStatus || 'pending_review', // pending_review | verified | rejected
       deliveryDetails: null,
     };
     setOrders(prev => {
@@ -203,6 +205,14 @@ export function AppProvider({ children }) {
   const updateOrderStatus = useCallback((orderId, status) => {
     setOrders(prev => {
       const next = prev.map(o => o.id === orderId ? { ...o, status } : o);
+      saveToLS(LS_ORDERS_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const updatePaymentStatus = useCallback((orderId, paymentStatus) => {
+    setOrders(prev => {
+      const next = prev.map(o => o.id === orderId ? { ...o, paymentStatus } : o);
       saveToLS(LS_ORDERS_KEY, next);
       return next;
     });
@@ -232,7 +242,7 @@ export function AppProvider({ children }) {
         wishlist, toggleWishlist, isWishlisted,
       }}>
         <OrdersContext.Provider value={{
-          orders, placeOrder, updateOrderStatus, updateOrderDelivery, deleteOrder,
+          orders, placeOrder, updateOrderStatus, updatePaymentStatus, updateOrderDelivery, deleteOrder,
           managedProducts, addProduct, updateProduct, deleteProduct, toggleStock, resetProducts,
           allUsers: USERS,
         }}>
