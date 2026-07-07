@@ -2,8 +2,10 @@ import { createContext, useContext, useState, useCallback, useEffect } from 'rea
 import { products as allProducts } from '../data/products';
 
 // ─────────────── Storage Helpers ───────────────
-const LS_PRODUCTS_KEY = 's4l_products_v2';
-const LS_ORDERS_KEY   = 's4l_orders_v2';
+const LS_PRODUCTS_KEY  = 's4l_products_v2';
+const LS_ORDERS_KEY    = 's4l_orders_v2';
+const LS_CART_KEY      = 's4l_cart_v1';
+const LS_WISHLIST_KEY  = 's4l_wishlist_v1';
 
 function loadFromLS(key, fallback) {
   try {
@@ -79,9 +81,12 @@ export function AppProvider({ children }) {
   const logout        = useCallback(() => setCurrentUser(null), []);
   const updateProfile = useCallback((updates) => setCurrentUser(prev => ({ ...prev, ...updates })), []);
 
-  // ──── Cart ────
-  const [cart, setCart]         = useState([]);
+  // ──── Cart — persisted ────
+  const [cart, setCart]         = useState(() => loadFromLS(LS_CART_KEY, []));
   const [cartOpen, setCartOpen] = useState(false);
+
+  // Save cart on every change
+  useEffect(() => { saveToLS(LS_CART_KEY, cart); }, [cart]);
 
   const addToCart = useCallback((product) => {
     setCart(prev => {
@@ -103,8 +108,11 @@ export function AppProvider({ children }) {
   const cartTotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const cartCount = cart.reduce((s, i) => s + i.qty, 0);
 
-  // ──── Wishlist ────
-  const [wishlist, setWishlist] = useState([]);
+  // ──── Wishlist — persisted ────
+  const [wishlist, setWishlist] = useState(() => loadFromLS(LS_WISHLIST_KEY, []));
+
+  // Save wishlist on every change
+  useEffect(() => { saveToLS(LS_WISHLIST_KEY, wishlist); }, [wishlist]);
 
   const toggleWishlist = useCallback((product) => {
     setWishlist(prev => {

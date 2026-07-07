@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /customer
+Disallow: /customer/*
+Disallow: /checkout
+Disallow: /login
+Disallow: /register
+
+Sitemap: https://sub4links.com/sitemap.xml

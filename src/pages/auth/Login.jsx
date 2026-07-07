@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, Shield, User } from 'lucide-react';
+import { Mail, Lock, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../context/AppContext';
 import './Auth.css';
 
@@ -18,16 +18,7 @@ export default function Login() {
     }
   };
 
-  const fillDemo = (role) => {
-    if (role === 'admin') {
-      setEmail('admin@sup4links.com');
-      setPassword('admin123');
-    } else {
-      setEmail('user@sup4links.com');
-      setPassword('user123');
-    }
-    setAuthError('');
-  };
+
 
   return (
     <div className="auth-page">
@@ -41,25 +32,7 @@ export default function Login() {
           <p className="auth-subtitle">مرحباً بعودتك! يرجى إدخال بياناتك للمتابعة.</p>
         </div>
 
-        {/* Demo Credentials */}
-        <div style={{ display: 'flex', gap: '0.625rem', marginBottom: '1.25rem' }}>
-          <button
-            type="button"
-            className="btn btn-ghost"
-            style={{ flex: 1, fontSize: '0.8125rem', display: 'flex', alignItems: 'center', gap: '0.4rem', justifyContent: 'center', padding: '0.5rem' }}
-            onClick={() => fillDemo('admin')}
-          >
-            <Shield size={14} style={{ color: 'var(--s4l-accent-cyan)' }} /> دخول كمدير
-          </button>
-          <button
-            type="button"
-            className="btn btn-ghost"
-            style={{ flex: 1, fontSize: '0.8125rem', display: 'flex', alignItems: 'center', gap: '0.4rem', justifyContent: 'center', padding: '0.5rem' }}
-            onClick={() => fillDemo('customer')}
-          >
-            <User size={14} style={{ color: '#8B5CF6' }} /> دخول كعميل
-          </button>
-        </div>
+
 
         <form className="auth-form" onSubmit={handleSubmit}>
           {authError && (
@@ -112,12 +85,7 @@ export default function Login() {
           <p>ليس لديك حساب؟ <Link to="/register">سجل الآن</Link></p>
         </div>
 
-        {/* Hint */}
-        <div style={{ marginTop: '1rem', background: 'rgba(0,0,0,0.3)', borderRadius: '0.75rem', padding: '0.875rem 1rem', fontSize: '0.8125rem', color: 'var(--fg-muted)', lineHeight: '1.8' }}>
-          <strong style={{ color: 'var(--s4l-accent-cyan)' }}>بيانات الدخول التجريبية:</strong><br/>
-          🔐 المدير: admin@sup4links.com / admin123<br/>
-          👤 العميل: user@sup4links.com / user123
-        </div>
+
       </div>
     </div>
   );

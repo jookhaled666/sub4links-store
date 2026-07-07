@@ -10,19 +10,41 @@ const WhatsAppIcon = () => (
   </svg>
 );
 
+const FORMSPREE_URL = 'https://formspree.io/f/xyzgdwbp'; // endpoint → info@sub4links.com
+
 export default function ContactPage() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
+    setError('');
+    try {
+      const res = await fetch(FORMSPREE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          subject: form.subject,
+          message: form.message,
+        }),
+      });
+      if (res.ok) {
+        setSent(true);
+        setForm({ name: '', email: '', phone: '', subject: '', message: '' });
+      } else {
+        setError('حدث خطأ أثناء الإرسال. حاول مرة أخرى أو تواصل معنا عبر الواتساب.');
+      }
+    } catch {
+      setError('تعذّر الاتصال بالخادم. تحقق من اتصالك بالإنترنت.');
+    } finally {
       setLoading(false);
-      setSent(true);
-      setForm({ name: '', email: '', phone: '', subject: '', message: '' });
-    }, 1500);
+    }
   };
 
   return (
@@ -53,13 +75,13 @@ export default function ContactPage() {
                 <div className="contact-info-icon mail"><Mail size={22} /></div>
                 <div>
                   <h4>البريد الإلكتروني</h4>
-                  <p><a href="mailto:support@sub4links.com">support@sub4links.com</a></p>
+                  <p><a href="mailto:info@sub4links.com">info@sub4links.com</a></p>
                 </div>
               </div>
 
               {/* WhatsApp CTA */}
               <a
-                href="https://wa.me/201099599558"
+                href="https://wa.me/201055899599"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="whatsapp-cta"
@@ -144,6 +166,12 @@ export default function ContactPage() {
                       required
                     />
                   </div>
+
+                  {error && (
+                    <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '0.75rem', padding: '0.75rem 1rem', color: '#ef4444', fontSize: '0.875rem', marginBottom: '1rem' }}>
+                      {error}
+                    </div>
+                  )}
 
                   <button type="submit" className="contact-submit-btn" disabled={loading}>
                     {loading ? (
