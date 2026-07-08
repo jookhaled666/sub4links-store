@@ -1,4 +1,4 @@
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import {
   LayoutDashboard, Package, ShoppingCart, Users,
   LogOut, Settings, BarChart2, MessageSquare, Shield
@@ -37,6 +37,10 @@ export default function AdminLayout() {
   const { currentUser, logout } = useAuth();
   const { orders } = useOrders();
   const pendingCount = orders.filter(o => o.status === 'pending').length;
+
+  if (!currentUser || currentUser.role !== 'admin') {
+    return <Navigate to="/login" replace />;
+  }
 
   const handleLogout = () => {
     logout();

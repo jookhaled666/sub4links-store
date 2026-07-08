@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { collection, doc, onSnapshot, setDoc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
-import { ref, uploadString, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../firebase';
+import { db } from '../firebase';
 import { products as allProducts } from '../data/products';
 
 // ─────────────── Storage Helpers ───────────────
@@ -20,6 +19,15 @@ function loadFromLS(key, fallback) {
 
 function saveToLS(key, value) {
   try { localStorage.setItem(key, JSON.stringify(value)); } catch (_) {}
+}
+
+export function getGuestId() {
+  let gid = localStorage.getItem('guestId');
+  if (!gid) {
+    gid = `guest_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    localStorage.setItem('guestId', gid);
+  }
+  return gid;
 }
 
 // ─────────────── Contexts ───────────────
@@ -196,20 +204,10 @@ export function AppProvider({ children }) {
 
   const placeOrder = useCallback(async (cartItems, total, userId, buyerDetails = {}) => {
     const orderId = `ORD-${String(Date.now()).slice(-6)}`;
-    let paymentProofUrl = null;
-
-    if (buyerDetails.paymentProof) {
-      try {
-        const proofRef = ref(storage, `receipts/${orderId}`);
-        await uploadString(proofRef, buyerDetails.paymentProof, 'data_url');
-        paymentProofUrl = await getDownloadURL(proofRef);
-      } catch (err) {
-        console.error("Error uploading receipt:", err);
-      }
-    }
+    const activeUserId = userId || getGuestId();
 
     const newOrder = {
-      userId: userId || 2,
+      userId: activeUserId,
       date: new Date().toISOString().split('T')[0],
       createdAt: new Date().toISOString(),
       items: cartItems,
@@ -219,7 +217,7 @@ export function AppProvider({ children }) {
       buyerEmail:     buyerDetails.email         || '',
       buyerPhone:     buyerDetails.phone         || '',
       payMethod:      buyerDetails.payMethod     || 'instapay',
-      paymentProof:   paymentProofUrl,
+      paymentProof:   buyerDetails.paymentProof  || null,
       paymentStatus:  buyerDetails.paymentStatus || 'pending_review',
       deliveryDetails: null,
     };
@@ -255,6 +253,7 @@ export function AppProvider({ children }) {
           orders, placeOrder, updateOrderStatus, updatePaymentStatus, updateOrderDelivery, deleteOrder,
           managedProducts, addProduct, updateProduct, deleteProduct, toggleStock, resetProducts,
           allUsers: USERS,
+          getGuestId,
         }}>
           {children}
         </OrdersContext.Provider>

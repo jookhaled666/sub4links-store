@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Eye, Package, CheckCircle, Clock, X, ShoppingBag, Copy, Check, ExternalLink } from 'lucide-react';
-import { useOrders, useAuth } from '../../context/AppContext';
+import { useOrders, useAuth, getGuestId } from '../../context/AppContext';
 import { Link } from 'react-router-dom';
 
 const statusLabel = { completed: 'مكتمل ومفعّل', pending: 'قيد التفعيل', cancelled: 'ملغي' };
@@ -19,7 +19,8 @@ export default function CustomerOrders() {
   const [viewOrder, setViewOrder] = useState(null);
   const [copiedField, setCopiedField] = useState(null); // 'key', 'user', 'pass'
 
-  const myOrders = orders.filter(o => o.userId === (currentUser?.id || 2));
+  const activeUserId = currentUser?.id || getGuestId();
+  const myOrders = orders.filter(o => o.userId === activeUserId);
 
   const handleCopy = (text, fieldName) => {
     navigator.clipboard.writeText(text);
