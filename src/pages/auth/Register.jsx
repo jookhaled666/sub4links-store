@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, ArrowRight } from 'lucide-react';
+import { useAuth } from '../../context/AppContext';
 import './Auth.css';
 
 export default function Register() {
@@ -8,11 +9,14 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const { register, authError } = useAuth();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Dummy register logic
-    navigate('/customer');
+    const result = await register(name, email, password);
+    if (result.ok) {
+      navigate('/customer');
+    }
   };
 
   return (

@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { collection, doc, onSnapshot, setDoc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
-import { db } from '../firebase';
+import { collection, doc, onSnapshot, setDoc, updateDoc, deleteDoc, query, orderBy, getDoc } from 'firebase/firestore';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
+import { db, auth } from '../firebase';
 import { products as allProducts } from '../data/products';
 
 // ─────────────── Storage Helpers ───────────────
@@ -35,62 +36,90 @@ const CartContext    = createContext(null);
 const AuthContext    = createContext(null);
 const OrdersContext  = createContext(null);
 
-// ─────────── Users DB ─────────────────
-const USERS = [
-  { id: 1, name: 'أدمن النظام',  email: 'admin@sup4links.com', password: 'admin123', role: 'admin',    phone: '01000000000', address: 'القاهرة، مصر',  field: 'إدارة الأعمال',      gender: 'boy' },
-  { id: 2, name: 'أحمد محمود',   email: 'user@sup4links.com',  password: 'user123',  role: 'customer', phone: '01012345678', address: 'الجيزة، مصر',   field: 'تطوير البرمجيات',   gender: 'boy' },
-];
-
-// ─────────────── SEED ORDERS ───────────────
-const SEED_ORDERS = [
-  {
-    id: 'ORD-001',
-    userId: 2,
-    date: '2026-06-10',
-    items: [{ ...allProducts[7], qty: 1 }],
-    total: allProducts[7].price,
-    status: 'completed',
-    buyerName: 'أحمد محمود',
-    buyerEmail: 'user@sup4links.com',
-    buyerPhone: '01012345678',
-    payMethod: 'card',
-    deliveryDetails: null,
-  },
-  {
-    id: 'ORD-002',
-    userId: 2,
-    date: '2026-06-12',
-    items: [{ ...allProducts[0], qty: 1 }, { ...allProducts[3], qty: 1 }],
-    total: allProducts[0].price + allProducts[3].price,
-    status: 'pending',
-    buyerName: 'أحمد محمود',
-    buyerEmail: 'user@sup4links.com',
-    buyerPhone: '01012345678',
-    payMethod: 'instapay',
-    deliveryDetails: null,
-  },
-];
-
 // ─────────────── PROVIDER ───────────────
 export function AppProvider({ children }) {
 
   // ──── Auth ────
   const [currentUser, setCurrentUser] = useState(null);
   const [authError, setAuthError]     = useState('');
+  const [authLoading, setAuthLoading] = useState(true);
 
-  const login = useCallback((email, password) => {
-    const found = USERS.find(u => u.email === email && u.password === password);
-    if (found) {
-      setCurrentUser(found);
-      setAuthError('');
-      return { ok: true, role: found.role };
-    }
-    setAuthError('البريد الإلكتروني أو كلمة المرور غير صحيحة');
-    return { ok: false };
+  // Monitor auth state
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Fetch additional user data from Firestore
+        const docRef = doc(db, 'users', user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setCurrentUser({ id: user.uid, ...docSnap.data() });
+        } else {
+          setCurrentUser({ id: user.uid, email: user.email, role: 'customer' });
+        }
+      } else {
+        setCurrentUser(null);
+      }
+      setAuthLoading(false);
+    });
+    return () => unsubscribe();
   }, []);
 
-  const logout        = useCallback(() => setCurrentUser(null), []);
-  const updateProfile = useCallback((updates) => setCurrentUser(prev => ({ ...prev, ...updates })), []);
+  const login = async (email, password) => {
+    try {
+      setAuthError('');
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      const docRef = doc(db, 'users', user.uid);
+      const docSnap = await getDoc(docRef);
+      let role = 'customer';
+      if (docSnap.exists()) {
+        role = docSnap.data().role || 'customer';
+      }
+      return { ok: true, role };
+    } catch (err) {
+      setAuthError('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+      return { ok: false };
+    }
+  };
+
+  const register = async (name, email, password) => {
+    try {
+      setAuthError('');
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      const role = email === 'admin@sup4links.com' ? 'admin' : 'customer';
+
+      // Save extra user details to Firestore
+      const newUser = {
+        name,
+        email,
+        role,
+        createdAt: new Date().toISOString()
+      };
+      await setDoc(doc(db, 'users', user.uid), newUser);
+      return { ok: true, role };
+    } catch (err) {
+      if (err.code === 'auth/email-already-in-use') {
+        setAuthError('البريد الإلكتروني مسجل مسبقاً');
+      } else {
+        setAuthError('حدث خطأ أثناء التسجيل');
+      }
+      return { ok: false };
+    }
+  };
+
+  const logout = async () => {
+    await signOut(auth);
+    setCurrentUser(null);
+  };
+
+  const updateProfile = useCallback(async (updates) => {
+    if (!currentUser) return;
+    const userRef = doc(db, 'users', currentUser.id);
+    await updateDoc(userRef, updates);
+    setCurrentUser(prev => ({ ...prev, ...updates }));
+  }, [currentUser]);
 
   // ──── Cart — persisted ────
   const [cart, setCart]         = useState(() => loadFromLS(LS_CART_KEY, []));
@@ -243,7 +272,7 @@ export function AppProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ currentUser, login, logout, updateProfile, authError, setAuthError, USERS }}>
+    <AuthContext.Provider value={{ currentUser, login, register, logout, updateProfile, authError, setAuthError, authLoading }}>
       <CartContext.Provider value={{
         cart, cartOpen, setCartOpen, cartTotal, cartCount,
         addToCart, removeFromCart, updateQty, clearCart,
@@ -252,7 +281,7 @@ export function AppProvider({ children }) {
         <OrdersContext.Provider value={{
           orders, placeOrder, updateOrderStatus, updatePaymentStatus, updateOrderDelivery, deleteOrder,
           managedProducts, addProduct, updateProduct, deleteProduct, toggleStock, resetProducts,
-          allUsers: USERS,
+          allUsers: [],
           getGuestId,
         }}>
           {children}
