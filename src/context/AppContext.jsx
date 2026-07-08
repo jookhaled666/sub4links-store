@@ -1,4 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { collection, doc, onSnapshot, setDoc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '../firebase';
 import { products as allProducts } from '../data/products';
 
 // ─────────────── Storage Helpers ───────────────
@@ -175,22 +178,40 @@ export function AppProvider({ children }) {
   }, []);
 
   // ──────────────────────────────────────────────────
-  //  ORDERS — persisted in localStorage
+  //  ORDERS — persisted in Firestore
   // ──────────────────────────────────────────────────
-  const [orders, setOrders] = useState(() =>
-    loadFromLS(LS_ORDERS_KEY, SEED_ORDERS)
-  );
+  const [orders, setOrders] = useState([]);
 
-  // Keep localStorage in sync on every change
   useEffect(() => {
-    saveToLS(LS_ORDERS_KEY, orders);
-  }, [orders]);
+    const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const ordersData = [];
+      snapshot.forEach((doc) => {
+        ordersData.push({ id: doc.id, ...doc.data() });
+      });
+      setOrders(ordersData);
+    });
+    return () => unsubscribe();
+  }, []);
 
-  const placeOrder = useCallback((cartItems, total, userId, buyerDetails = {}) => {
+  const placeOrder = useCallback(async (cartItems, total, userId, buyerDetails = {}) => {
+    const orderId = `ORD-${String(Date.now()).slice(-6)}`;
+    let paymentProofUrl = null;
+
+    if (buyerDetails.paymentProof) {
+      try {
+        const proofRef = ref(storage, `receipts/${orderId}`);
+        await uploadString(proofRef, buyerDetails.paymentProof, 'data_url');
+        paymentProofUrl = await getDownloadURL(proofRef);
+      } catch (err) {
+        console.error("Error uploading receipt:", err);
+      }
+    }
+
     const newOrder = {
-      id: `ORD-${String(Date.now()).slice(-6)}`,
       userId: userId || 2,
       date: new Date().toISOString().split('T')[0],
+      createdAt: new Date().toISOString(),
       items: cartItems,
       total,
       status: 'pending',
@@ -198,48 +219,29 @@ export function AppProvider({ children }) {
       buyerEmail:     buyerDetails.email         || '',
       buyerPhone:     buyerDetails.phone         || '',
       payMethod:      buyerDetails.payMethod     || 'instapay',
-      paymentProof:   buyerDetails.paymentProof  || null,   // صورة الإيصال base64
-      paymentStatus:  buyerDetails.paymentStatus || 'pending_review', // pending_review | verified | rejected
+      paymentProof:   paymentProofUrl,
+      paymentStatus:  buyerDetails.paymentStatus || 'pending_review',
       deliveryDetails: null,
     };
-    setOrders(prev => {
-      const next = [newOrder, ...prev];
-      saveToLS(LS_ORDERS_KEY, next);
-      return next;
-    });
-    return newOrder;
+    
+    await setDoc(doc(db, 'orders', orderId), newOrder);
+    return { id: orderId, ...newOrder };
   }, []);
 
-  const updateOrderStatus = useCallback((orderId, status) => {
-    setOrders(prev => {
-      const next = prev.map(o => o.id === orderId ? { ...o, status } : o);
-      saveToLS(LS_ORDERS_KEY, next);
-      return next;
-    });
+  const updateOrderStatus = useCallback(async (orderId, status) => {
+    await updateDoc(doc(db, 'orders', orderId), { status });
   }, []);
 
-  const updatePaymentStatus = useCallback((orderId, paymentStatus) => {
-    setOrders(prev => {
-      const next = prev.map(o => o.id === orderId ? { ...o, paymentStatus } : o);
-      saveToLS(LS_ORDERS_KEY, next);
-      return next;
-    });
+  const updatePaymentStatus = useCallback(async (orderId, paymentStatus) => {
+    await updateDoc(doc(db, 'orders', orderId), { paymentStatus });
   }, []);
 
-  const updateOrderDelivery = useCallback((orderId, deliveryDetails) => {
-    setOrders(prev => {
-      const next = prev.map(o => o.id === orderId ? { ...o, deliveryDetails } : o);
-      saveToLS(LS_ORDERS_KEY, next);
-      return next;
-    });
+  const updateOrderDelivery = useCallback(async (orderId, deliveryDetails) => {
+    await updateDoc(doc(db, 'orders', orderId), { deliveryDetails });
   }, []);
 
-  const deleteOrder = useCallback((orderId) => {
-    setOrders(prev => {
-      const next = prev.filter(o => o.id !== orderId);
-      saveToLS(LS_ORDERS_KEY, next);
-      return next;
-    });
+  const deleteOrder = useCallback(async (orderId) => {
+    await deleteDoc(doc(db, 'orders', orderId));
   }, []);
 
   return (

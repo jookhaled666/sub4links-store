@@ -93,28 +93,33 @@ export default function CheckoutPage() {
     window.scrollTo(0, 0);
   };
 
-  const handlePaySubmit = (e) => {
+  const handlePaySubmit = async (e) => {
     e.preventDefault();
     if (!receiptImg) {
       setReceiptError('يرجى رفع صورة إيصال الدفع للمتابعة');
       return;
     }
     setLoading(true);
-    setTimeout(() => {
-      const order = placeOrder(cart, cartTotal, currentUser?.id || 2, {
+    
+    try {
+      const order = await placeOrder(cart, cartTotal, currentUser?.id || 2, {
         name: form.name,
         email: form.email,
         phone: form.phone,
         payMethod: form.payMethod,
-        paymentProof: receiptImg,      // ← صورة الإيصال مخزنة في الأوردر
-        paymentStatus: 'pending_review', // ← تحتاج مراجعة من الأدمن
+        paymentProof: receiptImg,
+        paymentStatus: 'pending_review',
       });
       setPlacedOrder(order);
       clearCart();
       setStep(3);
+    } catch (err) {
+      console.error(err);
+      setReceiptError('حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى.');
+    } finally {
       setLoading(false);
       window.scrollTo(0, 0);
-    }, 1500);
+    }
   };
 
   if (cart.length === 0 && step !== 3) {
