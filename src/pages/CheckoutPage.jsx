@@ -53,6 +53,7 @@ export default function CheckoutPage() {
   });
   const [step, setStep] = useState(1); // 1=info, 2=payment, 3=done
   const [loading, setLoading] = useState(false);
+  const [uploadMsg, setUploadMsg] = useState('');
   const [placedOrder, setPlacedOrder] = useState(null);
   const [receiptImg, setReceiptImg] = useState(null);   // base64 image
   const [receiptError, setReceiptError] = useState('');
@@ -70,11 +71,11 @@ export default function CheckoutPage() {
       const img = new window.Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 800;
-        const MAX_HEIGHT = 800;
+        const MAX_WIDTH = 300;   // ضغط أقوى — Firestore 1MB limit
+        const MAX_HEIGHT = 300;
         let width = img.width;
         let height = img.height;
-        
+
         if (width > height) {
           if (width > MAX_WIDTH) {
             height *= MAX_WIDTH / width;
@@ -90,7 +91,7 @@ export default function CheckoutPage() {
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.25); // quality 0.25
         callback(dataUrl);
       };
       img.src = e.target.result;
@@ -130,25 +131,33 @@ export default function CheckoutPage() {
       return;
     }
     setLoading(true);
-    
+    setUploadMsg('جاري رفع صورة الإيصال...');
+
     try {
-      const order = await placeOrder(cart, cartTotal, currentUser?.id || 2, {
-        name: form.name,
-        email: form.email,
-        phone: form.phone,
-        payMethod: form.payMethod,
-        paymentProof: receiptImg,
-        paymentStatus: 'pending_review',
-      });
+      const order = await placeOrder(
+        cart,
+        cartTotal,
+        currentUser?.id || null,
+        {
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          payMethod: form.payMethod,
+          paymentProof: receiptImg,
+          paymentStatus: 'pending_review',
+        },
+        (msg) => setUploadMsg(msg), // ← live progress messages
+      );
       setPlacedOrder(order);
-      clearCart();
-      setStep(3);
+      setStep(3);    // ← أولاً: انتقل للخطوة 3
+      clearCart();   // ← ثانياً: فرّغ السلة (no race condition)
+      window.scrollTo(0, 0);
     } catch (err) {
       console.error(err);
       setReceiptError('حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى.');
     } finally {
       setLoading(false);
-      window.scrollTo(0, 0);
+      setUploadMsg('');
     }
   };
 
@@ -408,7 +417,7 @@ export default function CheckoutPage() {
                         style={{ flex: 1 }}
                       >
                         {loading
-                          ? <span className="spinner" />
+                          ? <><span className="spinner" /> {uploadMsg || 'جاري الإرسال...'}</>
                           : `✅ إرسال الطلب مع الإيصال — ${cartTotal.toLocaleString('ar-EG')} ج.م`
                         }
                       </button>

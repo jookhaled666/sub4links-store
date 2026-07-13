@@ -9,6 +9,20 @@ const LS_PRODUCTS_KEY  = 's4l_products_v2';
 const LS_ORDERS_KEY    = 's4l_orders_v2';
 const LS_CART_KEY      = 's4l_cart_v1';
 const LS_WISHLIST_KEY  = 's4l_wishlist_v1';
+const IMGBB_API_KEY    = 'c47dae7c9024befa73290c616fb3eefd';
+
+// Upload receipt image to ImgBB (free hosting) → returns public URL
+async function uploadReceiptToImgBB(base64DataUrl) {
+  const base64 = base64DataUrl.replace(/^data:image\/\w+;base64,/, '');
+  const form = new FormData();
+  form.append('key', IMGBB_API_KEY);
+  form.append('image', base64);
+  const res = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: form });
+  if (!res.ok) throw new Error(`ImgBB upload failed: ${res.status}`);
+  const json = await res.json();
+  if (!json.success) throw new Error('ImgBB returned error');
+  return json.data.url; // permanent public URL
+}
 
 function loadFromLS(key, fallback) {
   try {
@@ -164,55 +178,63 @@ export function AppProvider({ children }) {
   const isWishlisted = useCallback((id) => wishlist.some(i => i.id === id), [wishlist]);
 
   // ──────────────────────────────────────────────────
-  //  PRODUCTS — persisted in localStorage
+  //  PRODUCTS — persisted in Firestore
   // ──────────────────────────────────────────────────
-  const [managedProducts, setManagedProducts] = useState(() =>
-    loadFromLS(LS_PRODUCTS_KEY, allProducts)
-  );
+  const [managedProducts, setManagedProducts] = useState([]);
 
-  // Keep localStorage in sync on every change
   useEffect(() => {
-    saveToLS(LS_PRODUCTS_KEY, managedProducts);
+    const q = query(collection(db, 'products'));
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
+      if (snapshot.empty) {
+        // First time initialization: seed from allProducts
+        for (const p of allProducts) {
+          await setDoc(doc(db, 'products', p.id.toString()), p);
+        }
+      } else {
+        const prodData = [];
+        snapshot.forEach((d) => {
+          const data = d.data();
+          prodData.push({ ...data, id: isNaN(Number(d.id)) ? d.id : Number(d.id) });
+        });
+        // Sort by ID to keep order stable
+        prodData.sort((a, b) => {
+          if (typeof a.id === 'number' && typeof b.id === 'number') return b.id - a.id; // descending order like before (newest first)? wait, the original was newP, ...prev
+          return String(b.id).localeCompare(String(a.id));
+        });
+        setManagedProducts(prodData);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const addProduct = useCallback(async (product) => {
+    const newId = Date.now();
+    const newP = { ...product, id: newId, inStock: true, rating: 5.0, reviews: 0 };
+    await setDoc(doc(db, 'products', newId.toString()), newP);
+  }, []);
+
+  const updateProduct = useCallback(async (id, updates) => {
+    await updateDoc(doc(db, 'products', id.toString()), updates);
+  }, []);
+
+  const deleteProduct = useCallback(async (id) => {
+    await deleteDoc(doc(db, 'products', id.toString()));
+  }, []);
+
+  const toggleStock = useCallback(async (id) => {
+    const p = managedProducts.find(x => x.id === id);
+    if(p) {
+      await updateDoc(doc(db, 'products', id.toString()), { inStock: !p.inStock });
+    }
   }, [managedProducts]);
 
-  const addProduct = useCallback((product) => {
-    const newP = { ...product, id: Date.now(), inStock: true, rating: 5.0, reviews: 0 };
-    setManagedProducts(prev => {
-      const next = [newP, ...prev];
-      saveToLS(LS_PRODUCTS_KEY, next);
-      return next;
-    });
-  }, []);
-
-  const updateProduct = useCallback((id, updates) => {
-    setManagedProducts(prev => {
-      const next = prev.map(p => p.id === id ? { ...p, ...updates } : p);
-      saveToLS(LS_PRODUCTS_KEY, next);
-      return next;
-    });
-  }, []);
-
-  const deleteProduct = useCallback((id) => {
-    setManagedProducts(prev => {
-      const next = prev.filter(p => p.id !== id);
-      saveToLS(LS_PRODUCTS_KEY, next);
-      return next;
-    });
-  }, []);
-
-  const toggleStock = useCallback((id) => {
-    setManagedProducts(prev => {
-      const next = prev.map(p => p.id === id ? { ...p, inStock: !p.inStock } : p);
-      saveToLS(LS_PRODUCTS_KEY, next);
-      return next;
-    });
-  }, []);
-
   // Reset products to original data (useful for admin)
-  const resetProducts = useCallback(() => {
-    localStorage.removeItem(LS_PRODUCTS_KEY);
-    setManagedProducts(allProducts);
-  }, []);
+  const resetProducts = useCallback(async () => {
+    for (const p of managedProducts) {
+      await deleteDoc(doc(db, 'products', p.id.toString()));
+    }
+    // They will be re-seeded automatically by onSnapshot when empty
+  }, [managedProducts]);
 
   // ──────────────────────────────────────────────────
   //  ORDERS — persisted in Firestore
@@ -231,10 +253,23 @@ export function AppProvider({ children }) {
     return () => unsubscribe();
   }, []);
 
-  const placeOrder = useCallback(async (cartItems, total, userId, buyerDetails = {}) => {
+  const placeOrder = useCallback(async (cartItems, total, userId, buyerDetails = {}, onProgress) => {
     const orderId = `ORD-${String(Date.now()).slice(-6)}`;
     const activeUserId = userId || getGuestId();
 
+    // ── رفع الإيصال على ImgBB والحصول على URL فقط ──
+    let paymentProofUrl = null;
+    if (buyerDetails.paymentProof) {
+      onProgress?.('جاري رفع صورة الإيصال...');
+      try {
+        paymentProofUrl = await uploadReceiptToImgBB(buyerDetails.paymentProof);
+      } catch (err) {
+        console.warn('ImgBB upload failed, saving without image:', err);
+        // لا نوقف الطلب — نكمل بدون صورة
+      }
+    }
+
+    onProgress?.('جاري حفظ الطلب...');
     const newOrder = {
       userId: activeUserId,
       date: new Date().toISOString().split('T')[0],
@@ -246,11 +281,11 @@ export function AppProvider({ children }) {
       buyerEmail:     buyerDetails.email         || '',
       buyerPhone:     buyerDetails.phone         || '',
       payMethod:      buyerDetails.payMethod     || 'instapay',
-      paymentProof:   buyerDetails.paymentProof  || null,
+      paymentProof:   paymentProofUrl,            // URL فقط — لا base64
       paymentStatus:  buyerDetails.paymentStatus || 'pending_review',
       deliveryDetails: null,
     };
-    
+
     await setDoc(doc(db, 'orders', orderId), newOrder);
     return { id: orderId, ...newOrder };
   }, []);
