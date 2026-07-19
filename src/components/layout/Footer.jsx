@@ -20,7 +20,7 @@ export default function Footer() {
           <div className="footer__brand">
             <Link to="/" className="footer__logo" aria-label="Sub4Links الرئيسية">
               <img
-                src="https://res.cloudinary.com/dojt3kryr/image/upload/v1782920227/sub4links_logo_white_gvqpsu.png"
+                src="/images/sub4links-logo-new.png"
                 alt="Sub4Links"
                 className="footer__logo-img"
               />

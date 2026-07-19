@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, ShoppingCart, Heart, Eye, Zap, Globe, Clock } from 'lucide-react';
+import { Star, ShoppingCart, Heart, Eye, Zap, Globe, Clock, Search, SlidersHorizontal, ChevronDown } from 'lucide-react';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import CartDrawer from '../../components/cart/CartDrawer';
@@ -170,19 +170,26 @@ export default function ShopPage({ categoryId }) {
 
             {/* Search + Sort */}
             <div className="shop-filters">
-              <input
-                type="search"
-                className="shop-search"
-                placeholder="ابحث عن منتج..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-              />
-              <select className="shop-sort" value={sort} onChange={e => setSort(e.target.value)}>
-                <option value="default">الترتيب الافتراضي</option>
-                <option value="price-asc">السعر: من الأقل</option>
-                <option value="price-desc">السعر: من الأعلى</option>
-                <option value="rating">الأعلى تقييماً</option>
-              </select>
+              <div className="shop-search-wrapper">
+                <Search className="shop-search-icon" size={18} />
+                <input
+                  type="search"
+                  className="shop-search"
+                  placeholder="ابحث عن منتج..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                />
+              </div>
+              <div className="shop-sort-wrapper">
+                <SlidersHorizontal className="shop-sort-icon-right" size={18} />
+                <select className="shop-sort" value={sort} onChange={e => setSort(e.target.value)}>
+                  <option value="default">الترتيب الافتراضي</option>
+                  <option value="price-asc">السعر: من الأقل</option>
+                  <option value="price-desc">السعر: من الأعلى</option>
+                  <option value="rating">الأعلى تقييماً</option>
+                </select>
+                <ChevronDown className="shop-sort-icon-left" size={16} />
+              </div>
             </div>
           </div>
 

@@ -1,10 +1,12 @@
 /* ============================================================
-   Newsletter Section
+   Newsletter Section (Premium Dark)
    ============================================================ */
 
 .newsletter__inner {
   position: relative;
-  background: var(--gradient-hero);
+  background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   border-radius: var(--r-2xl);
   overflow: hidden;
   padding: var(--sp-16) var(--sp-12);
@@ -18,19 +20,21 @@
 
 .newsletter__circle {
   position: absolute;
-  width: 500px;
-  height: 500px;
-  right: -200px;
-  top: -200px;
+  width: 600px;
+  height: 600px;
+  right: -250px;
+  top: -250px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(47,167,255,0.2) 0%, transparent 60%);
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, transparent 60%);
+  filter: blur(40px);
 }
 
 .newsletter__dots {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+  opacity: 0.5;
 }
 
 .newsletter__content {
@@ -41,107 +45,144 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--sp-5);
+  gap: var(--sp-6);
+  z-index: 2;
 }
 
 .newsletter__icon {
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.12);
-  color: white;
-  border-radius: var(--r-lg);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(14, 165, 233, 0.05) 100%);
+  color: #38bdf8;
+  border-radius: var(--r-xl);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.15);
+  margin-bottom: var(--sp-2);
 }
 
 .newsletter__title {
-  color: white;
-  font-size: clamp(1.75rem, 3vw, var(--fs-36));
+  color: #f8fafc;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
 
 .newsletter__text {
-  color: rgba(255, 255, 255, 0.7);
+  color: #94a3b8;
   font-size: var(--fs-16);
   line-height: 1.6;
+  max-width: 480px;
 }
 
 /* Form */
 .newsletter__form {
   width: 100%;
-  max-width: 480px;
+  max-width: 500px;
   margin-top: var(--sp-2);
 }
 
 .newsletter__input-wrap {
   display: flex;
   gap: var(--sp-2);
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--r-lg);
-  padding: var(--sp-1);
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--r-xl);
+  padding: var(--sp-2);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.newsletter__input-wrap:focus-within {
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1);
 }
 
 .newsletter__input {
   flex: 1;
   border: none;
-  background: none;
+  background: transparent;
   outline: none;
-  color: white;
-  font-size: var(--fs-14);
+  color: #f8fafc;
+  font-size: var(--fs-15);
   padding: var(--sp-3) var(--sp-4);
 }
 
 .newsletter__input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: #64748b;
 }
 
 .newsletter__submit {
   flex-shrink: 0;
-  background: var(--s4l-accent-cyan);
-  color: #0f172a;
-  box-shadow: var(--glow-brand);
-  font-weight: 700;
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: white;
+  border-radius: var(--r-lg);
+  font-weight: 600;
+  padding: var(--sp-3) var(--sp-6);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3);
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
 .newsletter__submit:hover {
-  background: white;
-  color: #0f172a;
-  transform: scale(1.02);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(14, 165, 233, 0.4);
+  background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+}
+
+.newsletter__submit:active {
+  transform: translateY(0);
 }
 
 .newsletter__trust {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--sp-2);
   font-size: var(--fs-13);
-  color: rgba(255, 255, 255, 0.5);
+  color: #64748b;
+  margin-top: var(--sp-2);
 }
 
 /* ====== RESPONSIVE ====== */
 @media (max-width: 639px) {
   .newsletter__inner {
-    padding: var(--sp-10) var(--sp-5);
+    padding: var(--sp-10) var(--sp-6);
+    border-radius: var(--r-xl);
   }
 
   .newsletter__input-wrap {
     flex-direction: column;
-    gap: var(--sp-2);
-    background: none;
+    background: transparent;
     border: none;
     padding: 0;
+    backdrop-filter: none;
+  }
+
+  .newsletter__input-wrap:focus-within {
+    box-shadow: none;
   }
 
   .newsletter__input {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: var(--r-md);
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--r-lg);
+    padding: var(--sp-4);
+  }
+
+  .newsletter__input:focus {
+    border-color: rgba(56, 189, 248, 0.4);
   }
 
   .newsletter__submit {
     width: 100%;
     justify-content: center;
-    padding: var(--sp-3) var(--sp-6);
+    padding: var(--sp-4);
   }
 }

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Search, ShoppingBag, User, Menu, X, Heart,
-  ChevronDown, Globe, Zap, BookOpen, Home, Grid3X3
+  ChevronDown, Globe, Zap, BookOpen
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import CartDrawer from '../cart/CartDrawer';
@@ -12,7 +12,6 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [bottomMenuOpen, setBottomMenuOpen] = useState(false);
   const { cartCount, wishlist, cartOpen, setCartOpen } = useCart();
   const location = useLocation();
   const navigate = useNavigate();
@@ -31,7 +30,6 @@ export default function Navbar() {
   // Close menu on route change
   useEffect(() => { 
     setMenuOpen(false); 
-    setBottomMenuOpen(false);
   }, [location]);
 
   const isActive = (path) => location.pathname === path;
@@ -42,12 +40,11 @@ export default function Navbar() {
         <div className="navbar__inner container">
           {/* Logo */}
           <Link to="/" className="navbar__logo" aria-label="Sub4Links الرئيسية">
-            <img
-              src="https://res.cloudinary.com/dojt3kryr/image/upload/v1782920227/sub4links_logo_white_gvqpsu.png"
-              alt="Sub4Links"
-              className="navbar__logo-img"
-              style={{ filter: 'none', height: '38px' }}
-            />
+              <img
+                src="/images/sub4links-logo-new.png"
+                alt="Sub4Links"
+                className="navbar__logo-img"
+              />
           </Link>
 
           {/* Desktop Nav */}
@@ -179,10 +176,9 @@ export default function Navbar() {
             <div className="mobile-menu__header">
               <Link to="/" className="navbar__logo">
                 <img
-                  src="https://res.cloudinary.com/dojt3kryr/image/upload/v1782920227/sub4links_logo_white_gvqpsu.png"
+                  src="/images/sub4links-logo-new.png"
                   alt="Sub4Links"
                   className="navbar__logo-img"
-                  style={{ filter: 'none', height: '34px' }}
                 />
               </Link>
               <button onClick={() => setMenuOpen(false)} aria-label="Close menu">
@@ -222,59 +218,7 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* ── Mobile Bottom Navigation FAB ── */}
-      <div className="mobile-fab-nav" id="mobile-fab-nav">
-        {/* Overlay to close menu when clicking outside */}
-        {bottomMenuOpen && (
-          <div className="mobile-fab-overlay" onClick={() => setBottomMenuOpen(false)}></div>
-        )}
-        
-        {/* The Expandable Menu */}
-        <div className={`mobile-fab-menu ${bottomMenuOpen ? 'mobile-fab-menu--open' : ''}`}>
-          <Link to="/" className={`fab-item ${isActive('/') ? 'fab-item--active' : ''}`} onClick={() => setBottomMenuOpen(false)}>
-            <span className="fab-item__icon"><Home size={20} /></span>
-            <span className="fab-item__label">الرئيسية</span>
-          </Link>
 
-          <Link to="/shop" className={`fab-item ${isActive('/shop') || location.pathname.startsWith('/subscriptions') || location.pathname.startsWith('/services') || location.pathname.startsWith('/courses') ? 'fab-item--active' : ''}`} onClick={() => setBottomMenuOpen(false)}>
-            <span className="fab-item__icon"><Grid3X3 size={20} /></span>
-            <span className="fab-item__label">المنتجات</span>
-          </Link>
-
-          <button
-            className="fab-item"
-            onClick={() => { setCartOpen(true); setBottomMenuOpen(false); }}
-          >
-            <span className="fab-item__icon">
-              <ShoppingBag size={20} />
-              {cartCount > 0 && <span className="fab-item__badge">{cartCount}</span>}
-            </span>
-            <span className="fab-item__label">السلة</span>
-          </button>
-
-          <button
-            className="fab-item"
-            onClick={() => { setSearchOpen(true); setBottomMenuOpen(false); }}
-          >
-            <span className="fab-item__icon"><Search size={20} /></span>
-            <span className="fab-item__label">بحث</span>
-          </button>
-
-          <Link to="/customer" className={`fab-item ${location.pathname.startsWith('/customer') ? 'fab-item--active' : ''}`} onClick={() => setBottomMenuOpen(false)}>
-            <span className="fab-item__icon"><User size={20} /></span>
-            <span className="fab-item__label">حسابي</span>
-          </Link>
-        </div>
-
-        {/* The Main Trigger Button */}
-        <button
-          className={`mobile-fab-btn ${bottomMenuOpen ? 'mobile-fab-btn--active' : ''}`}
-          onClick={() => setBottomMenuOpen(!bottomMenuOpen)}
-          aria-label="Toggle Navigation Menu"
-        >
-          {bottomMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </div>
 
       {/* Cart Drawer */}
       <CartDrawer />

@@ -73,26 +73,98 @@
 
 .shop-filters {
   display: flex;
-  gap: 0.75rem;
+  gap: 1rem;
   flex-wrap: wrap;
+  align-items: center;
+}
+
+.shop-search-wrapper,
+.shop-sort-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.02), 0 4px 10px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(12px);
+}
+
+.shop-search-wrapper:focus-within,
+.shop-sort-wrapper:focus-within,
+.shop-search-wrapper:hover,
+.shop-sort-wrapper:hover {
+  border-color: rgba(6, 182, 212, 0.8);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.05), 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 15px rgba(6, 182, 212, 0.3);
+  transform: translateY(-2px);
+}
+
+.shop-search-icon,
+.shop-sort-icon-right {
+  position: absolute;
+  right: 1.25rem;
+  color: rgba(0, 0, 0, 0.6);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.shop-sort-icon-left {
+  position: absolute;
+  left: 1.25rem;
+  color: rgba(0, 0, 0, 0.6);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.shop-search-wrapper:focus-within .shop-search-icon,
+.shop-sort-wrapper:focus-within .shop-sort-icon-right,
+.shop-sort-wrapper:focus-within .shop-sort-icon-left {
+  color: #00b8cc;
+  transform: scale(1.1);
 }
 
 .shop-search,
 .shop-sort {
-  background: rgba(0,0,0,0.4);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 0.625rem;
-  padding: 0.6rem 1rem;
-  color: var(--fg);
+  background: transparent;
+  border: none;
+  color: #000000;
   font-family: inherit;
-  font-size: 0.875rem;
+  font-size: 0.95rem;
+  font-weight: 600;
   outline: none;
-  transition: border-color 0.3s;
+  width: 100%;
 }
-.shop-search:focus,
-.shop-sort:focus { border-color: var(--s4l-accent-cyan); }
-.shop-search { min-width: 220px; }
-.shop-sort { cursor: pointer; }
+
+.shop-search::placeholder {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.shop-search {
+  min-width: 280px;
+  padding-top: 0.875rem;
+  padding-bottom: 0.875rem;
+  padding-right: 3.25rem;
+  padding-left: 1.25rem;
+}
+
+.shop-sort {
+  cursor: pointer;
+  padding-top: 0.875rem;
+  padding-bottom: 0.875rem;
+  padding-right: 3.25rem;
+  padding-left: 3.25rem;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.shop-sort option {
+  background: #ffffff;
+  color: #000000;
+  padding: 10px;
+}
 
 .shop-count {
   color: var(--fg-muted);

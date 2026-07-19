@@ -27,9 +27,15 @@
   margin-bottom: var(--sp-4);
 }
 .footer__logo-img {
-  height: 36px;
+  height: 42px;
   width: auto;
   object-fit: contain;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-origin: right center;
+}
+.footer__logo:hover .footer__logo-img {
+  transform: scale(1.04) translateY(-2px);
+  filter: drop-shadow(0 6px 12px rgba(37, 99, 235, 0.12));
 }
 
 .footer__desc {
