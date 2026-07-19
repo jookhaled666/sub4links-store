@@ -12,6 +12,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [bottomMenuOpen, setBottomMenuOpen] = useState(false);
   const { cartCount, wishlist, cartOpen, setCartOpen } = useCart();
   const location = useLocation();
   const navigate = useNavigate();
@@ -28,7 +29,10 @@ export default function Navbar() {
   }, [menuOpen]);
 
   // Close menu on route change
-  useEffect(() => { setMenuOpen(false); }, [location]);
+  useEffect(() => { 
+    setMenuOpen(false); 
+    setBottomMenuOpen(false);
+  }, [location]);
 
   const isActive = (path) => location.pathname === path;
 
@@ -218,41 +222,58 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* ── Mobile Bottom Navigation Bar ── */}
-      <div className="bottom-nav" id="bottom-nav">
-        <Link to="/" className={`bottom-nav__item ${isActive('/') ? 'bottom-nav__item--active' : ''}`}>
-          <span className="bottom-nav__icon"><Home size={20} /></span>
-          <span className="bottom-nav__label">الرئيسية</span>
-        </Link>
+      {/* ── Mobile Bottom Navigation FAB ── */}
+      <div className="mobile-fab-nav" id="mobile-fab-nav">
+        {/* Overlay to close menu when clicking outside */}
+        {bottomMenuOpen && (
+          <div className="mobile-fab-overlay" onClick={() => setBottomMenuOpen(false)}></div>
+        )}
+        
+        {/* The Expandable Menu */}
+        <div className={`mobile-fab-menu ${bottomMenuOpen ? 'mobile-fab-menu--open' : ''}`}>
+          <Link to="/" className={`fab-item ${isActive('/') ? 'fab-item--active' : ''}`} onClick={() => setBottomMenuOpen(false)}>
+            <span className="fab-item__icon"><Home size={20} /></span>
+            <span className="fab-item__label">الرئيسية</span>
+          </Link>
 
-        <Link to="/shop" className={`bottom-nav__item ${isActive('/shop') || location.pathname.startsWith('/subscriptions') || location.pathname.startsWith('/services') || location.pathname.startsWith('/courses') ? 'bottom-nav__item--active' : ''}`}>
-          <span className="bottom-nav__icon"><Grid3X3 size={20} /></span>
-          <span className="bottom-nav__label">المنتجات</span>
-        </Link>
+          <Link to="/shop" className={`fab-item ${isActive('/shop') || location.pathname.startsWith('/subscriptions') || location.pathname.startsWith('/services') || location.pathname.startsWith('/courses') ? 'fab-item--active' : ''}`} onClick={() => setBottomMenuOpen(false)}>
+            <span className="fab-item__icon"><Grid3X3 size={20} /></span>
+            <span className="fab-item__label">المنتجات</span>
+          </Link>
 
+          <button
+            className="fab-item"
+            onClick={() => { setCartOpen(true); setBottomMenuOpen(false); }}
+          >
+            <span className="fab-item__icon">
+              <ShoppingBag size={20} />
+              {cartCount > 0 && <span className="fab-item__badge">{cartCount}</span>}
+            </span>
+            <span className="fab-item__label">السلة</span>
+          </button>
+
+          <button
+            className="fab-item"
+            onClick={() => { setSearchOpen(true); setBottomMenuOpen(false); }}
+          >
+            <span className="fab-item__icon"><Search size={20} /></span>
+            <span className="fab-item__label">بحث</span>
+          </button>
+
+          <Link to="/customer" className={`fab-item ${location.pathname.startsWith('/customer') ? 'fab-item--active' : ''}`} onClick={() => setBottomMenuOpen(false)}>
+            <span className="fab-item__icon"><User size={20} /></span>
+            <span className="fab-item__label">حسابي</span>
+          </Link>
+        </div>
+
+        {/* The Main Trigger Button */}
         <button
-          className="bottom-nav__item"
-          onClick={() => setCartOpen(true)}
+          className={`mobile-fab-btn ${bottomMenuOpen ? 'mobile-fab-btn--active' : ''}`}
+          onClick={() => setBottomMenuOpen(!bottomMenuOpen)}
+          aria-label="Toggle Navigation Menu"
         >
-          <span className="bottom-nav__icon">
-            <ShoppingBag size={20} />
-            {cartCount > 0 && <span className="bottom-nav__badge">{cartCount}</span>}
-          </span>
-          <span className="bottom-nav__label">السلة</span>
+          {bottomMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
-
-        <button
-          className="bottom-nav__item"
-          onClick={() => setSearchOpen(!searchOpen)}
-        >
-          <span className="bottom-nav__icon"><Search size={20} /></span>
-          <span className="bottom-nav__label">بحث</span>
-        </button>
-
-        <Link to="/customer" className={`bottom-nav__item ${location.pathname.startsWith('/customer') ? 'bottom-nav__item--active' : ''}`}>
-          <span className="bottom-nav__icon"><User size={20} /></span>
-          <span className="bottom-nav__label">حسابي</span>
-        </Link>
       </div>
 
       {/* Cart Drawer */}
