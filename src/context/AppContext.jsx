@@ -91,12 +91,18 @@ export function AppProvider({ children }) {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       const defaultRole = email === 'admin@sup4links.com' ? 'admin' : 'customer';
+
+      // ── نقرأ الـ role مباشرة من Firestore بشكل موثوق ──
       const docRef = doc(db, 'users', user.uid);
       const docSnap = await getDoc(docRef);
-      let role = defaultRole;
-      if (docSnap.exists()) {
-        role = docSnap.data().role || defaultRole;
-      }
+      const role = docSnap.exists() ? (docSnap.data().role || defaultRole) : defaultRole;
+
+      // ── نُحدّث currentUser يدوياً فوراً لضمان توفّره قبل navigate ──
+      const userData = docSnap.exists()
+        ? { id: user.uid, ...docSnap.data(), role }
+        : { id: user.uid, email: user.email, role };
+      setCurrentUser(userData);
+
       return { ok: true, role };
     } catch (err) {
       setAuthError('البريد الإلكتروني أو كلمة المرور غير صحيحة');

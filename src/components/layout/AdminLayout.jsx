@@ -57,8 +57,12 @@ export default function AdminLayout() {
     );
   }
 
-  if (!currentUser || currentUser.role !== 'admin') {
+  if (!currentUser) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (currentUser.role !== 'admin') {
+    return <Navigate to="/customer" replace />;
   }
 
   const handleLogout = () => {
