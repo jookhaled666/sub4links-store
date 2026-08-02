@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Search, ShoppingBag, User, Menu, X, Heart,
-  ChevronDown, Globe, Zap, BookOpen
+  ChevronDown, Globe, Zap, BookOpen, LayoutDashboard
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AppContext';
 import CartDrawer from '../cart/CartDrawer';
 import './Navbar.css';
 
@@ -13,8 +14,12 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const { cartCount, wishlist, cartOpen, setCartOpen } = useCart();
+  const { currentUser } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+
+  // توجيه زرار الحساب حسب الـ role
+  const dashboardPath = currentUser?.role === 'admin' ? '/admin' : currentUser ? '/customer' : '/login';
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -119,8 +124,9 @@ export default function Navbar() {
               )}
             </button>
 
-            <Link to="/customer" className="navbar__action-btn navbar__user-btn" aria-label="حسابي" id="account-btn">
-              <User size={18} />
+            <Link to={dashboardPath} className="navbar__action-btn navbar__user-btn" aria-label="لوحة التحكم" id="account-btn" title={currentUser?.role === 'admin' ? 'لوحة الإدارة' : currentUser ? 'حسابي' : 'تسجيل الدخول'}>
+              {currentUser?.role === 'admin' ? <LayoutDashboard size={18} /> : <User size={18} />}
+              {currentUser && <span style={{ position: 'absolute', bottom: 6, right: 6, width: 7, height: 7, borderRadius: '50%', background: currentUser.role === 'admin' ? '#06b6d4' : '#22c55e', border: '1.5px solid var(--s4l-bg)' }} />}
             </Link>
 
             <button
@@ -207,11 +213,11 @@ export default function Navbar() {
             </nav>
             <div className="mobile-menu__footer">
               <Link
-                to="/login"
+                to={dashboardPath}
                 className="btn btn-primary btn-lg"
                 style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
               >
-                <User size={18} /> تسجيل الدخول
+                {currentUser?.role === 'admin' ? <><LayoutDashboard size={18} /> لوحة الإدارة</> : currentUser ? <><User size={18} /> حسابي</> : <><User size={18} /> تسجيل الدخول</>}
               </Link>
             </div>
           </div>
