@@ -62,13 +62,20 @@ export function AppProvider({ children }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Fetch additional user data from Firestore
-        const docRef = doc(db, 'users', user.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setCurrentUser({ id: user.uid, ...docSnap.data() });
-        } else {
-          setCurrentUser({ id: user.uid, email: user.email, role: 'customer' });
+        const defaultRole = user.email === 'admin@sup4links.com' ? 'admin' : 'customer';
+        try {
+          // Fetch additional user data from Firestore
+          const docRef = doc(db, 'users', user.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            setCurrentUser({ id: user.uid, ...data, role: data.role || defaultRole });
+          } else {
+            setCurrentUser({ id: user.uid, email: user.email, role: defaultRole });
+          }
+        } catch (e) {
+          console.error("Error fetching user data from Firestore:", e);
+          setCurrentUser({ id: user.uid, email: user.email, role: defaultRole });
         }
       } else {
         setCurrentUser(null);
@@ -83,11 +90,12 @@ export function AppProvider({ children }) {
       setAuthError('');
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+      const defaultRole = email === 'admin@sup4links.com' ? 'admin' : 'customer';
       const docRef = doc(db, 'users', user.uid);
       const docSnap = await getDoc(docRef);
-      let role = 'customer';
+      let role = defaultRole;
       if (docSnap.exists()) {
-        role = docSnap.data().role || 'customer';
+        role = docSnap.data().role || defaultRole;
       }
       return { ok: true, role };
     } catch (err) {
@@ -143,12 +151,17 @@ export function AppProvider({ children }) {
   useEffect(() => { saveToLS(LS_CART_KEY, cart); }, [cart]);
 
   const addToCart = useCallback((product) => {
+    if (product && product.inStock === false) {
+      console.warn('Cannot add out of stock product to cart:', product.name);
+      return false;
+    }
     setCart(prev => {
       const exists = prev.find(i => i.id === product.id);
       if (exists) return prev.map(i => i.id === product.id ? { ...i, qty: i.qty + 1 } : i);
       return [...prev, { ...product, qty: 1 }];
     });
     setCartOpen(true);
+    return true;
   }, []);
 
   const removeFromCart = useCallback((id) => setCart(prev => prev.filter(i => i.id !== id)), []);
@@ -178,9 +191,9 @@ export function AppProvider({ children }) {
   const isWishlisted = useCallback((id) => wishlist.some(i => i.id === id), [wishlist]);
 
   // ──────────────────────────────────────────────────
-  //  PRODUCTS — persisted in Firestore
+  //  PRODUCTS — persisted in LS & Firestore
   // ──────────────────────────────────────────────────
-  const [managedProducts, setManagedProducts] = useState([]);
+  const [managedProducts, setManagedProducts] = useState(() => loadFromLS(LS_PRODUCTS_KEY, allProducts));
 
   useEffect(() => {
     const q = query(collection(db, 'products'));
@@ -188,21 +201,34 @@ export function AppProvider({ children }) {
       if (snapshot.empty) {
         // First time initialization: seed from allProducts
         for (const p of allProducts) {
-          await setDoc(doc(db, 'products', p.id.toString()), p);
+          try {
+            await setDoc(doc(db, 'products', p.id.toString()), p);
+          } catch (e) {
+            console.error('Error seeding product:', e);
+          }
         }
+        setManagedProducts(allProducts);
+        saveToLS(LS_PRODUCTS_KEY, allProducts);
       } else {
         const prodData = [];
         snapshot.forEach((d) => {
           const data = d.data();
-          prodData.push({ ...data, id: isNaN(Number(d.id)) ? d.id : Number(d.id) });
+          prodData.push({ 
+            ...data, 
+            id: isNaN(Number(d.id)) ? d.id : Number(d.id),
+            inStock: data.inStock !== false
+          });
         });
         // Sort by ID to keep order stable
         prodData.sort((a, b) => {
-          if (typeof a.id === 'number' && typeof b.id === 'number') return b.id - a.id; // descending order like before (newest first)? wait, the original was newP, ...prev
+          if (typeof a.id === 'number' && typeof b.id === 'number') return b.id - a.id;
           return String(b.id).localeCompare(String(a.id));
         });
         setManagedProducts(prodData);
+        saveToLS(LS_PRODUCTS_KEY, prodData);
       }
+    }, (err) => {
+      console.warn("Firestore snapshot listener notice:", err);
     });
     return () => unsubscribe();
   }, []);
@@ -210,30 +236,80 @@ export function AppProvider({ children }) {
   const addProduct = useCallback(async (product) => {
     const newId = Date.now();
     const newP = { ...product, id: newId, inStock: true, rating: 5.0, reviews: 0 };
-    await setDoc(doc(db, 'products', newId.toString()), newP);
+    setManagedProducts(prev => {
+      const updated = [newP, ...prev];
+      saveToLS(LS_PRODUCTS_KEY, updated);
+      return updated;
+    });
+    try {
+      await setDoc(doc(db, 'products', newId.toString()), newP);
+    } catch (err) {
+      console.error('Error saving new product to Firestore:', err);
+    }
   }, []);
 
   const updateProduct = useCallback(async (id, updates) => {
-    await updateDoc(doc(db, 'products', id.toString()), updates);
+    const cleanUpdates = { ...updates };
+    setManagedProducts(prev => {
+      const updated = prev.map(p => (String(p.id) === String(id) ? { ...p, ...cleanUpdates } : p));
+      saveToLS(LS_PRODUCTS_KEY, updated);
+      return updated;
+    });
+
+    try {
+      const docRef = doc(db, 'products', id.toString());
+      await setDoc(docRef, cleanUpdates, { merge: true });
+    } catch (err) {
+      console.error('Error updating product in Firestore:', err);
+    }
   }, []);
 
   const deleteProduct = useCallback(async (id) => {
-    await deleteDoc(doc(db, 'products', id.toString()));
+    setManagedProducts(prev => {
+      const updated = prev.filter(p => String(p.id) !== String(id));
+      saveToLS(LS_PRODUCTS_KEY, updated);
+      return updated;
+    });
+    try {
+      await deleteDoc(doc(db, 'products', id.toString()));
+    } catch (err) {
+      console.error('Error deleting product from Firestore:', err);
+    }
   }, []);
 
   const toggleStock = useCallback(async (id) => {
-    const p = managedProducts.find(x => x.id === id);
-    if(p) {
-      await updateDoc(doc(db, 'products', id.toString()), { inStock: !p.inStock });
+    let targetProduct = managedProducts.find(x => String(x.id) === String(id));
+    if (!targetProduct) {
+      const lsProducts = loadFromLS(LS_PRODUCTS_KEY, []);
+      targetProduct = lsProducts.find(x => String(x.id) === String(id));
     }
+    if (!targetProduct) return false;
+
+    const newStock = !(targetProduct.inStock !== false);
+
+    setManagedProducts(prev => {
+      const updated = prev.map(x => String(x.id) === String(id) ? { ...x, inStock: newStock } : x);
+      saveToLS(LS_PRODUCTS_KEY, updated);
+      return updated;
+    });
+
+    try {
+      await setDoc(doc(db, 'products', id.toString()), { inStock: newStock }, { merge: true });
+    } catch (err) {
+      console.error('Error toggling stock in Firestore:', err);
+    }
+    return newStock;
   }, [managedProducts]);
 
   // Reset products to original data (useful for admin)
   const resetProducts = useCallback(async () => {
+    setManagedProducts(allProducts);
+    saveToLS(LS_PRODUCTS_KEY, allProducts);
     for (const p of managedProducts) {
-      await deleteDoc(doc(db, 'products', p.id.toString()));
+      try {
+        await deleteDoc(doc(db, 'products', p.id.toString()));
+      } catch (_) {}
     }
-    // They will be re-seeded automatically by onSnapshot when empty
   }, [managedProducts]);
 
   // ──────────────────────────────────────────────────

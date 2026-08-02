@@ -19,22 +19,49 @@ function MiniCard({ product }) {
   const [added, setAdded] = useState(false);
 
   const handleAdd = () => {
+    if (product.inStock === false) return;
     addToCart(product);
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
   };
 
   return (
-    <div className="product-card card" id={`product-${product.id}`}>
+    <div className="product-card card" id={`product-${product.id}`} style={product.inStock === false ? { opacity: 0.9 } : {}}>
       {/* Image */}
-      <div className="product-card__image-wrap">
+      <div className="product-card__image-wrap" style={{ position: 'relative' }}>
         <img
           src={product.image}
           alt={product.name}
           className="product-card__image"
           loading="lazy"
+          style={{
+            opacity: product.inStock === false ? 0.55 : 1,
+            filter: product.inStock === false ? 'grayscale(80%)' : 'none',
+            transition: 'all 0.3s ease'
+          }}
         />
-        {product.badge && (
+        {product.inStock === false && (
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            background: 'rgba(239, 68, 68, 0.95)',
+            color: '#ffffff',
+            padding: '0.45rem 1rem',
+            borderRadius: '9999px',
+            fontSize: '0.85rem',
+            fontWeight: 700,
+            boxShadow: '0 4px 20px rgba(239, 68, 68, 0.5)',
+            zIndex: 5,
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            backdropFilter: 'blur(4px)'
+          }}>
+            🚫 غير متاح حالياً
+          </div>
+        )}
+        {product.badge && product.inStock !== false && (
           <span className={`product-card__badge badge ${
             product.badge === 'الأكثر مبيعاً' ? 'badge-brand' :
             product.badge === 'جديد' || product.badge === 'New' ? 'badge-success' :
@@ -65,6 +92,9 @@ function MiniCard({ product }) {
             className={`product-card__action product-card__action--primary ${added ? 'added' : ''}`}
             aria-label="Add to cart"
             onClick={handleAdd}
+            disabled={product.inStock === false}
+            style={product.inStock === false ? { background: '#374151', color: '#9CA3AF', cursor: 'not-allowed', opacity: 0.75 } : {}}
+            title={product.inStock === false ? 'غير متاح حالياً' : 'أضف للسلة'}
           >
             <ShoppingCart size={18} />
           </button>

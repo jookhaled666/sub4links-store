@@ -118,6 +118,15 @@ export default function AdminProducts() {
     showNotify('🗑️ تم حذف المنتج', 'error');
   };
 
+  const handleToggleStock = async (id) => {
+    const res = await toggleStock(id);
+    if (res) {
+      showNotify('🟢 أصبح المنتج متاحاً في الموقع الآن');
+    } else {
+      showNotify('🔴 تم إيقاف طلبات المنتج لعرضه كـ "غير متاح"', 'error');
+    }
+  };
+
   const handleReset = () => {
     if (window.confirm('هل تريد إعادة تعيين جميع المنتجات للبيانات الأصلية؟ سيتم فقدان التعديلات.')) {
       resetProducts();
@@ -216,8 +225,8 @@ export default function AdminProducts() {
                 <td>
                   <button
                     style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-                    onClick={() => toggleStock(product.id)}
-                    title="تغيير حالة التوفر"
+                    onClick={() => handleToggleStock(product.id)}
+                    title="تغيير حالة التوفر في الموقع"
                   >
                     {product.inStock
                       ? <span className="status-badge instock">متاح <ToggleRight size={14} /></span>

@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, Mail } from 'lucide-react';
+import { Phone, Mail, Truck, X } from 'lucide-react';
 import './Footer.css';
 
 const InstagramIcon = () => (
@@ -12,6 +13,8 @@ const WhatsAppIcon = () => (
 );
 
 export default function Footer() {
+  const [showShippingModal, setShowShippingModal] = useState(false);
+
   return (
     <footer className="footer" id="footer">
       <div className="container">
@@ -87,18 +90,51 @@ export default function Footer() {
           </p>
           <div className="footer__legal">
             <Link to="/privacy">سياسة الخصوصية</Link>
+            <button type="button" onClick={() => setShowShippingModal(true)} className="footer__legal-btn">
+              Shipping
+            </button>
             <Link to="/terms">شروط الخدمة</Link>
           </div>
           <div className="footer__payment">
             <span className="footer__payment-label">دفع آمن مع</span>
             <div className="footer__payment-icons">
-              <span className="footer__payment-icon">Visa</span>
-              <span className="footer__payment-icon">MC</span>
+              <span className="footer__payment-icon">Fawry</span>
+              <span className="footer__payment-icon">InstaPay</span>
+              <span className="footer__payment-icon">Vodafone Cash</span>
               <span className="footer__payment-icon">Paymob</span>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Shipping Policy Modal */}
+      {showShippingModal && (
+        <div className="shipping-modal-overlay" onClick={() => setShowShippingModal(false)}>
+          <div className="shipping-modal-box" onClick={(e) => e.stopPropagation()}>
+            <button 
+              className="shipping-modal-x-btn" 
+              onClick={() => setShowShippingModal(false)}
+              style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}
+              aria-label="إغلاق"
+            >
+              <X size={20} />
+            </button>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px', color: '#2563eb' }}>
+              <Truck size={40} />
+            </div>
+            <h3 className="shipping-modal-title">No Shipping Policy</h3>
+            <p className="shipping-modal-text" style={{ marginBottom: '12px' }}>
+              <strong>No shipping policy:</strong> All products and services offered on Sub4Links are digital subscriptions and online design services. There is no physical shipping required; all deliveries and activations are completed instantly or electronically upon order confirmation.
+            </p>
+            <p className="shipping-modal-text" style={{ fontSize: '0.9rem', opacity: 0.9, borderTop: '1px solid #e5e7eb', paddingTop: '12px' }}>
+              <strong>لا توجد سياسة شحن:</strong> جميع المنتجات والخدمات المتاحة على موقع Sub4Links هي اشتراكات رقمية وخدمات أونلاين، ولا تتطلب أي شحن أو توصيل للمنزل. يتم تسليم وتفعيل جميع الطلبات إلكترونياً وبشكل فوري بعد إتمام الدفع.
+            </p>
+            <button className="shipping-modal-close" onClick={() => setShowShippingModal(false)}>
+              حسناً، فهمت (Got it)
+            </button>
+          </div>
+        </div>
+      )}
     </footer>
   );
 }

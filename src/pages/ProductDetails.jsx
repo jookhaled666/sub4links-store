@@ -94,13 +94,20 @@ export default function ProductDetails() {
                 src={product.image} 
                 alt={product.name} 
                 className="product-main-image"
+                style={{ filter: product.inStock === false ? 'grayscale(1) opacity(0.7)' : 'none' }}
               />
-              {product.badge && (
-                <span className="product-badge badge badge-brand">
-                  {product.badge}
+              {product.inStock === false ? (
+                <span className="product-badge badge" style={{ background: '#ef4444', color: '#fff', border: '1px solid rgba(239, 68, 68, 0.5)' }}>
+                  🚫 غير متاح حالياً
                 </span>
+              ) : (
+                product.badge && (
+                  <span className="product-badge badge badge-brand">
+                    {product.badge}
+                  </span>
+                )
               )}
-              {product.discount > 0 && (
+              {product.discount > 0 && product.inStock !== false && (
                 <span className="product-discount">
                   -{product.discount}%
                 </span>
@@ -139,11 +146,13 @@ export default function ProductDetails() {
               {/* Action Buttons */}
               <div className="product-actions">
                 <button
-                  className={`btn action-btn ${addedToCart ? 'btn-success' : 'btn-primary'}`}
-                  onClick={handleAddToCart}
+                  className={`btn action-btn ${product.inStock === false ? 'btn-secondary' : addedToCart ? 'btn-success' : 'btn-primary'}`}
+                  onClick={product.inStock === false ? undefined : handleAddToCart}
+                  disabled={product.inStock === false}
+                  style={product.inStock === false ? { opacity: 0.6, cursor: 'not-allowed', borderColor: '#ef4444', color: '#ef4444' } : {}}
                 >
                   <ShoppingCart size={20} />
-                  {addedToCart ? '✓ تمت الإضافة للسلة' : 'أضف إلى السلة'}
+                  {product.inStock === false ? '🚫 غير متاح حالياً' : addedToCart ? '✓ تمت الإضافة للسلة' : 'أضف إلى السلة'}
                 </button>
                 <button
                   className={`btn action-btn ${isWishlisted(product?.id) ? 'btn-wish-active' : 'btn-secondary'}`}

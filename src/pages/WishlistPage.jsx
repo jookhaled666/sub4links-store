@@ -54,12 +54,16 @@ export default function WishlistPage() {
             <>
               <div className="wishlist-grid">
                 {wishlist.map(product => (
-                  <div key={product.id} className="wishlist-card">
+                  <div key={product.id} className="wishlist-card" style={{ opacity: product.inStock === false ? 0.75 : 1 }}>
                     {/* Image */}
                     <div className="wishlist-card__img-wrap">
-                      <img src={product.image} alt={product.name} className="wishlist-card__img" loading="lazy" />
-                      {product.badge && <span className="wishlist-card__badge">{product.badge}</span>}
-                      {product.discount > 0 && (
+                      <img src={product.image} alt={product.name} className="wishlist-card__img" loading="lazy" style={{ filter: product.inStock === false ? 'grayscale(1)' : 'none' }} />
+                      {product.inStock === false ? (
+                        <span className="wishlist-card__badge" style={{ background: '#ef4444', color: '#fff' }}>🚫 غير متاح</span>
+                      ) : (
+                        product.badge && <span className="wishlist-card__badge">{product.badge}</span>
+                      )}
+                      {product.discount > 0 && product.inStock !== false && (
                         <span className="wishlist-card__discount">-{product.discount}%</span>
                       )}
                       <button
@@ -88,11 +92,13 @@ export default function WishlistPage() {
                       {/* Actions */}
                       <div className="wishlist-card__actions">
                         <button
-                          className={`btn btn-primary wishlist-cta ${addedIds.includes(product.id) ? 'added' : ''}`}
-                          onClick={() => handleAddToCart(product)}
+                          className={`btn ${product.inStock === false ? 'btn-secondary' : 'btn-primary'} wishlist-cta ${addedIds.includes(product.id) ? 'added' : ''}`}
+                          onClick={product.inStock === false ? undefined : () => handleAddToCart(product)}
+                          disabled={product.inStock === false}
+                          style={product.inStock === false ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
                         >
                           <ShoppingCart size={16} />
-                          {addedIds.includes(product.id) ? '✓ أُضيف للسلة' : 'أضف للسلة'}
+                          {product.inStock === false ? 'غير متاح' : addedIds.includes(product.id) ? '✓ أُضيف للسلة' : 'أضف للسلة'}
                         </button>
                         <Link to={`/product/${product.id}`} className="btn btn-secondary wishlist-view">
                           <Eye size={16} />
@@ -108,10 +114,10 @@ export default function WishlistPage() {
               <div className="wishlist-bulk">
                 <button
                   className="btn btn-primary"
-                  onClick={() => wishlist.forEach(p => addToCart(p))}
+                  onClick={() => wishlist.filter(p => p.inStock !== false).forEach(p => addToCart(p))}
                 >
                   <ShoppingCart size={18} />
-                  إضافة الكل للسلة
+                  إضافة المنتجات المتاحة للسلة
                 </button>
               </div>
             </>

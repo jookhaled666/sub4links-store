@@ -38,6 +38,7 @@ function ProductGrid({ items }) {
   const [addedId, setAddedId] = useState(null);
 
   const handleAdd = (product) => {
+    if (product.inStock === false) return;
     addToCart(product);
     setAddedId(product.id);
     setTimeout(() => setAddedId(null), 1800);
@@ -46,11 +47,42 @@ function ProductGrid({ items }) {
   return (
     <div className="shop-grid">
       {items.map(product => (
-        <div key={product.id} className="shop-card">
+        <div key={product.id} className="shop-card" style={product.inStock === false ? { opacity: 0.9 } : {}}>
           {/* Image */}
-          <div className="shop-card__img-wrap">
-            <img src={product.image} alt={product.name} className="shop-card__img" loading="lazy" />
-            {product.badge && <span className="shop-card__badge">{product.badge}</span>}
+          <div className="shop-card__img-wrap" style={{ position: 'relative' }}>
+            <img 
+              src={product.image} 
+              alt={product.name} 
+              className="shop-card__img" 
+              loading="lazy" 
+              style={{
+                opacity: product.inStock === false ? 0.55 : 1,
+                filter: product.inStock === false ? 'grayscale(80%)' : 'none',
+                transition: 'all 0.3s ease'
+              }}
+            />
+            {product.inStock === false && (
+              <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                background: 'rgba(239, 68, 68, 0.95)',
+                color: '#ffffff',
+                padding: '0.45rem 1rem',
+                borderRadius: '9999px',
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                boxShadow: '0 4px 20px rgba(239, 68, 68, 0.5)',
+                zIndex: 5,
+                whiteSpace: 'nowrap',
+                pointerEvents: 'none',
+                backdropFilter: 'blur(4px)'
+              }}>
+                🚫 غير متاح حالياً
+              </div>
+            )}
+            {product.badge && product.inStock !== false && <span className="shop-card__badge">{product.badge}</span>}
             {product.discount > 0 && <span className="shop-card__discount">-{product.discount}%</span>}
 
             {/* Hover Actions */}
@@ -95,9 +127,23 @@ function ProductGrid({ items }) {
             <button
               className={`shop-card__cta ${addedId === product.id ? 'added' : ''}`}
               onClick={() => handleAdd(product)}
+              disabled={product.inStock === false}
+              style={product.inStock === false ? {
+                background: '#374151',
+                color: '#9CA3AF',
+                cursor: 'not-allowed',
+                border: '1px solid #4B5563',
+                opacity: 0.85
+              } : {}}
             >
-              <ShoppingCart size={17} />
-              {addedId === product.id ? '✓ تمت الإضافة' : 'أضف للسلة'}
+              {product.inStock === false ? (
+                '🚫 غير متاح للطلب'
+              ) : (
+                <>
+                  <ShoppingCart size={17} />
+                  {addedId === product.id ? '✓ تمت الإضافة' : 'أضف للسلة'}
+                </>
+              )}
             </button>
           </div>
         </div>
