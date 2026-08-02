@@ -34,9 +34,28 @@ const navGroups = [
 export default function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, authLoading } = useAuth();
   const { orders } = useOrders();
   const pendingCount = orders.filter(o => o.status === 'pending').length;
+
+  // ⏳ Firebase لا يزال يتحقق من الجلسة — انتظر قبل أي توجيه
+  if (authLoading) {
+    return (
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        minHeight: '100vh', background: 'var(--s4l-bg)',
+        flexDirection: 'column', gap: '1rem'
+      }}>
+        <div style={{
+          width: 48, height: 48, borderRadius: '50%',
+          border: '4px solid rgba(6,182,212,0.2)',
+          borderTopColor: 'var(--s4l-accent-cyan)',
+          animation: 'spin .8s linear infinite'
+        }} />
+        <p style={{ color: 'var(--fg-muted)', fontSize: '0.9rem' }}>جاري التحقق من الجلسة...</p>
+      </div>
+    );
+  }
 
   if (!currentUser || currentUser.role !== 'admin') {
     return <Navigate to="/login" replace />;

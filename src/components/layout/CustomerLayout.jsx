@@ -1,5 +1,5 @@
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { User, ShoppingBag, LogOut, Settings, Shield } from 'lucide-react';
+import { Outlet, Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
+import { User, ShoppingBag, LogOut, Settings } from 'lucide-react';
 import { useAuth } from '../../context/AppContext';
 import '../../pages/admin/Admin.css'; // Reuse dashboard styles
 
@@ -12,12 +12,36 @@ const menu = [
 export default function CustomerLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, authLoading } = useAuth();
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
+
+  // ⏳ Firebase لا يزال يتحقق من الجلسة — انتظر قبل أي توجيه
+  if (authLoading) {
+    return (
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        minHeight: '100vh', background: 'var(--s4l-bg)',
+        flexDirection: 'column', gap: '1rem'
+      }}>
+        <div style={{
+          width: 48, height: 48, borderRadius: '50%',
+          border: '4px solid rgba(59,130,246,0.2)',
+          borderTopColor: '#3b82f6',
+          animation: 'spin .8s linear infinite'
+        }} />
+        <p style={{ color: 'var(--fg-muted)', fontSize: '0.9rem' }}>جاري التحقق من الجلسة...</p>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
+
 
   const currentTitle = (() => {
     const found = menu.find(item => item.path === location.pathname);
